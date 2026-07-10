@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Outings — The 6AM Club | Weekend Runs & Recaps</title>
+  <meta name="description" content="Relive every sunrise, every stride, every breakthrough. Explore photo recaps and highlights from The 6AM Club weekend morning runs and fitness sessions.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Noise Texture -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- ==================== NAVIGATION ==================== -->
+  <nav class="nav" id="main-nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" id="nav-logo">
+        <span class="nav__logo-icon">6AM</span>
+        THE CLUB
+      </a>
+      <div class="nav__links" id="nav-links">
+        <a href="index.html" class="nav__link" id="nav-home">Home</a>
+        <a href="about.html" class="nav__link" id="nav-about">The Founder</a>
+        <a href="outings.html" class="nav__link nav__link--active" id="nav-outings">The Outings</a>
+        <a href="join.html" class="nav__link" id="nav-join">Join</a>
+        <a href="join.html" class="nav__cta" id="nav-cta-join">Join Now →</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO — OUTINGS ==================== -->
+  <section class="outings-hero" id="outings-hero">
+    <div class="outings-hero__bg">
+      <video autoplay muted loop playsinline preload="auto" class="outings-hero__video" id="outings-hero-video">
+        <source src="hero_image.webm" type="video/webm">
+        <img src="images/morning_run_hero.png" alt="6AM Club runners at sunrise" loading="eager">
+      </video>
+      <div class="outings-hero__gradient"></div>
+    </div>
+    <div class="outings-hero__content container">
+      <div class="outings-hero__overline reveal">
+        <span class="accent-line"></span>
+        <span class="label">Every Weekend. Every Weather. No Excuses.</span>
+      </div>
+      <h1 class="heading-xl reveal reveal--delay-1">THE<br>OUTINGS</h1>
+      <p class="body-lg reveal reveal--delay-2" style="max-width: 520px;">Relive every sunrise, every stride, every breakthrough. This is where discipline meets community — captured in real time.</p>
+      <div class="outings-hero__stat-bar reveal reveal--delay-3">
+        <div class="outings-hero__stat">
+          <span class="outings-hero__stat-value" id="stat-outings">10</span>
+          <span class="outings-hero__stat-label">Outings Logged</span>
+        </div>
+        <div class="outings-hero__stat">
+          <span class="outings-hero__stat-value" id="stat-km">1,240</span>
+          <span class="outings-hero__stat-label">KM Covered</span>
+        </div>
+        <div class="outings-hero__stat">
+          <span class="outings-hero__stat-value" id="stat-members">320+</span>
+          <span class="outings-hero__stat-label">Members Strong</span>
+        </div>
+        <div class="outings-hero__stat">
+          <span class="outings-hero__stat-value" id="stat-sunrises">10</span>
+          <span class="outings-hero__stat-label">Sunrises Caught</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FILTER BAR ==================== -->
+  <div class="filter-bar" id="filter-bar">
+    <div class="container">
+      <div class="filter-bar__inner">
+        <button class="pill pill--active" id="filter-all" data-filter="all">All Outings</button>
+        <button class="pill" id="filter-runs" data-filter="run">Saturday Runs</button>
+        <button class="pill" id="filter-fitness" data-filter="fitness">Fitness Sessions</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== FEATURED RECAP ==================== -->
+  <section class="gallery-section" id="gallery-section">
+    <div class="container">
+
+            <div class="gallery-grid" id="gallery-grid" style="margin-top: var(--space-2xl);">
+
+        <!-- Week 10 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.50 (1).jpeg" alt="Week 10 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.50.jpeg" alt="Week 10 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.51.jpeg" alt="Week 10 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.52 (1).jpeg" alt="Week 10 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 10</h3>
+          </div>
+        </div>
+
+        <!-- Week 9 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.52.jpeg" alt="Week 9 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.53.jpeg" alt="Week 9 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.54 (1).jpeg" alt="Week 9 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.54.jpeg" alt="Week 9 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 9</h3>
+          </div>
+        </div>
+
+        <!-- Week 8 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.55 (1).jpeg" alt="Week 8 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.55.jpeg" alt="Week 8 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.56 (1).jpeg" alt="Week 8 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.56.jpeg" alt="Week 8 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 8</h3>
+          </div>
+        </div>
+
+        <!-- Week 7 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.57.jpeg" alt="Week 7 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.58.jpeg" alt="Week 7 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.59 (1).jpeg" alt="Week 7 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.59 (2).jpeg" alt="Week 7 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 7</h3>
+          </div>
+        </div>
+
+        <!-- Week 6 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.30.59.jpeg" alt="Week 6 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.00.jpeg" alt="Week 6 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.01.jpeg" alt="Week 6 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.02 (1).jpeg" alt="Week 6 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 6</h3>
+          </div>
+        </div>
+
+        <!-- Week 5 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.02 (2).jpeg" alt="Week 5 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.02.jpeg" alt="Week 5 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.03 (1).jpeg" alt="Week 5 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.03.jpeg" alt="Week 5 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 5</h3>
+          </div>
+        </div>
+
+        <!-- Week 4 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.04 (1).jpeg" alt="Week 4 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.04.jpeg" alt="Week 4 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.05 (1).jpeg" alt="Week 4 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.05 (2).jpeg" alt="Week 4 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 4</h3>
+          </div>
+        </div>
+
+        <!-- Week 3 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.05.jpeg" alt="Week 3 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.31.06.jpeg" alt="Week 3 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.32.58 (1).jpeg" alt="Week 3 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.32.58.jpeg" alt="Week 3 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 3</h3>
+          </div>
+        </div>
+
+        <!-- Week 2 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.32.59 (1).jpeg" alt="Week 2 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.32.59.jpeg" alt="Week 2 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.33.00 (1).jpeg" alt="Week 2 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.33.00 (2).jpeg" alt="Week 2 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 2</h3>
+          </div>
+        </div>
+
+        <!-- Week 1 -->
+        <div class="recap-card reveal" data-category="run">
+          <div class="recap-card__image-collage">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.33.00 (3).jpeg" alt="Week 1 outing" class="collage-main">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.33.00.jpeg" alt="Week 1 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.33.01 (1).jpeg" alt="Week 1 outing">
+            <img src="pictures/WhatsApp Image 2026-07-07 at 06.33.01.jpeg" alt="Week 1 outing">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week 1</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Load More -->
+      <div style="text-align: center; margin-top: var(--space-2xl);">
+        <button class="btn btn--secondary" id="load-more-btn">
+          Load More Outings
+          <span class="btn__arrow">↓</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== CTA STRIP ==================== -->
+  <section class="cta-strip" id="cta-strip">
+    <div class="container">
+      <p class="label reveal" style="margin-bottom: var(--space-md);">You've Seen The Proof</p>
+      <h2 class="heading-lg cta-strip__title reveal reveal--delay-1">Stop Watching.<br><span class="text-accent">Start Running.</span></h2>
+      <p class="body-lg cta-strip__desc reveal reveal--delay-2">The next outing is this Saturday at 6AM. Your spot is waiting.</p>
+      <a href="join.html" class="btn btn--primary reveal reveal--delay-3" id="cta-join-club">
+        Join The Club
+        <span class="btn__arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div class="footer__brand">
+          <div class="nav__logo">
+            <span class="nav__logo-icon">6AM</span>
+            THE CLUB
+          </div>
+          <p class="footer__brand-desc">A weekend morning running and fitness community built on discipline, accountability, and the relentless pursuit of better.</p>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Navigate</h4>
+          <a href="index.html" class="footer__link">Home</a>
+          <a href="outings.html" class="footer__link">The Outings</a>
+          <a href="join.html" class="footer__link">Join the Club</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Community</h4>
+          <a href="https://chat.whatsapp.com/JSNSmbFl1RS0CyjRu9prfk?s=cl&p=i&ilr=0&amv=2" class="footer__link" target="_blank" rel="noopener noreferrer">WhatsApp Group</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Connect</h4>
+          <a href="https://www.instagram.com/the6amclubofficial?igsh=MTJhOTVyNnNjaHNzNw%3D%3D&utm_source=qr" target="_blank" class="footer__link">Instagram</a>
+          <a href="https://www.tiktok.com/@the6amclub0?_r=1&_t=ZS-97umuLSwM9n" target="_blank" class="footer__link">TikTok</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p class="body-sm">© 2025 The 6AM Club. Rise before the world does.</p>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/the6amclubofficial?igsh=MTJhOTVyNnNjaHNzNw%3D%3D&utm_source=qr" target="_blank" class="footer__social-link" aria-label="Instagram" id="social-ig">IG</a>
+          <a href="https://www.tiktok.com/@the6amclub0?_r=1&_t=ZS-97umuLSwM9n" target="_blank" class="footer__social-link" aria-label="TikTok" id="social-tk">TK</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="app.js"></script>
+</body>
+</html>

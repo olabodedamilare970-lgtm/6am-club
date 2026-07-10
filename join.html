@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Join The Club — The 6AM Club | Membership & Sign Up</title>
+  <meta name="description" content="Join The 6AM Club. Choose your membership, sign up, and start showing up every weekend at 6AM. Discipline is free. Excuses are expensive.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Noise Texture -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <!-- ==================== NAVIGATION ==================== -->
+  <nav class="nav" id="main-nav">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo" id="nav-logo">
+        <span class="nav__logo-icon">6AM</span>
+        THE CLUB
+      </a>
+      <div class="nav__links" id="nav-links">
+        <a href="index.html" class="nav__link" id="nav-home">Home</a>
+        <a href="about.html" class="nav__link" id="nav-about">The Founder</a>
+        <a href="outings.html" class="nav__link" id="nav-outings">The Outings</a>
+        <a href="join.html" class="nav__link nav__link--active" id="nav-join">Join</a>
+        <a href="join.html" class="nav__cta" id="nav-cta-join">Join Now →</a>
+      </div>
+      <button class="nav__toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== HERO — JOIN ==================== -->
+  <section class="join-hero" id="join-hero">
+    <div class="container">
+      <div class="reveal">
+        <span class="label" style="display: block; margin-bottom: var(--space-md);">
+          <span class="accent-line"></span>
+          Membership
+        </span>
+      </div>
+      <h1 class="heading-xl reveal reveal--delay-1">SHOW UP<br>At <span class="text-accent">6AM SATURDAY</span></h1>
+      <p class="body-lg reveal reveal--delay-2 join-hero__desc">Discipline is free. Excuses are expensive. Join our free community and become the person you keep promising yourself you'll be.</p>
+    </div>
+  </section>
+
+  <!-- ==================== HOW IT WORKS ==================== -->
+  <section class="how-section" id="how-it-works">
+    <div class="container text-center">
+      <span class="label reveal">The Process</span>
+      <h2 class="heading-lg reveal reveal--delay-1" style="margin-top: var(--space-md);">FROM SIGN-UP TO<br><span class="text-accent">SHOWING UP</span></h2>
+
+      <div class="how-grid">
+        <div class="how-step reveal">
+          <div class="how-step__number">01</div>
+          <h3 class="how-step__title">Pick Your Tier</h3>
+          <p class="how-step__desc">Choose Community (free), Committed, or Elite based on how deep you want to go.</p>
+        </div>
+        <div class="how-step reveal reveal--delay-1">
+          <div class="how-step__number">02</div>
+          <h3 class="how-step__title">Fill The Form</h3>
+          <p class="how-step__desc">Drop your details below. We'll add you to the WhatsApp group and send your first route map.</p>
+        </div>
+        <div class="how-step reveal reveal--delay-2">
+          <div class="how-step__number">03</div>
+          <h3 class="how-step__title">Set The Alarm</h3>
+          <p class="how-step__desc">Saturday. 6:00 AM. The meeting point drops in the group every Friday night. No snooze button.</p>
+        </div>
+        <div class="how-step reveal reveal--delay-3">
+          <div class="how-step__number">04</div>
+          <h3 class="how-step__title">Show Up & Level Up</h3>
+          <p class="how-step__desc">Run, train, connect, repeat. Watch yourself transform week by week. This is where it starts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SIGN-UP FORM ==================== -->
+  <section class="form-section" id="signup-form">
+    <div class="container">
+      <div class="form-layout">
+
+        <!-- Left Column: Info -->
+        <div class="form-info reveal">
+          <span class="label" style="display: block; margin-bottom: var(--space-md);">
+            <span class="accent-line"></span>
+            Get In Touch
+          </span>
+          <h2 class="heading-lg form-info__title">READY TO<br><span class="text-accent">EARN YOUR SUNRISE?</span></h2>
+          <p class="body-lg form-info__desc">Fill out the form and we'll get you set up before this Saturday. No commitment contracts. No fine print. Just you and the road.</p>
+
+          <div class="form-info__detail">
+            <div class="form-info__detail-icon">📍</div>
+            <div class="form-info__detail-text">
+              <span class="form-info__detail-label">Meeting Point</span>
+              <span class="form-info__detail-value">Rotates weekly — shared in the group every Friday</span>
+            </div>
+          </div>
+          <div class="form-info__detail">
+            <div class="form-info__detail-icon">⏰</div>
+            <div class="form-info__detail-text">
+              <span class="form-info__detail-label">When</span>
+              <span class="form-info__detail-value">Every Saturday — 6:00 AM sharp</span>
+            </div>
+          </div>
+          <div class="form-info__detail">
+            <div class="form-info__detail-icon">📱</div>
+            <div class="form-info__detail-text">
+              <span class="form-info__detail-label">Contact</span>
+              <span class="form-info__detail-value">hello@the6amclub.com</span>
+            </div>
+          </div>
+          <div class="form-info__detail">
+            <div class="form-info__detail-icon">📸</div>
+            <div class="form-info__detail-text">
+              <span class="form-info__detail-label">Instagram</span>
+              <span class="form-info__detail-value">@the6amclub</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Form -->
+        <div class="form-card reveal reveal--delay-2" id="form-card">
+          <h3 class="form-card__title">Join The 6AM Club</h3>
+          <p class="form-card__subtitle">Your transformation starts with one form.</p>
+
+          <form id="join-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label" for="first-name">First Name</label>
+                <input type="text" class="form-input" id="first-name" placeholder="Your first name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="last-name">Last Name</label>
+                <input type="text" class="form-input" id="last-name" placeholder="Your last name" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="email">Email Address</label>
+              <input type="email" class="form-input" id="email" placeholder="you@example.com" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone / WhatsApp Number</label>
+              <input type="tel" class="form-input" id="phone" placeholder="+234 800 000 0000" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="fitness-level">Fitness Level</label>
+              <select class="form-select" id="fitness-level" required>
+                <option value="" disabled selected>Be honest</option>
+                <option value="beginner">Beginner — Just starting</option>
+                <option value="intermediate">Intermediate — I run sometimes</option>
+                <option value="advanced">Advanced — Sub-25 min 5K</option>
+                <option value="elite">Elite — I eat KMs for breakfast</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="message">Anything Else? (Optional)</label>
+              <textarea class="form-textarea" id="message" placeholder="Injuries we should know about, goals you're chasing, or just tell us why you're done sleeping in..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-checkbox" id="checkbox-label">
+                <input type="checkbox" id="terms-check" required>
+                <span class="form-checkbox__text">I understand that by joining, I commit to showing up, pushing through, and never blaming the alarm clock. <strong style="color: var(--color-accent);">No excuses.</strong></span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn--primary form-submit" id="form-submit-btn">
+              Claim My Spot
+              <span class="btn__arrow">→</span>
+            </button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FAQ ==================== -->
+  <section class="faq-section" id="faq-section">
+    <div class="container text-center">
+      <span class="label reveal">Questions?</span>
+      <h2 class="heading-lg reveal reveal--delay-1" style="margin-top: var(--space-md);">BEFORE YOU <span class="text-accent">JOIN</span></h2>
+    </div>
+    <div class="container">
+      <div class="faq-list" id="faq-list">
+
+        <div class="faq-item" id="faq-1">
+          <button class="faq-item__question" aria-expanded="false">
+            Do I need to be a runner to join?
+            <span class="faq-item__icon">+</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Absolutely not. We have walkers, joggers, and elite runners all in the same group. Pace groups ensure everyone has company. The only requirement is that you show up at 6AM.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" id="faq-2">
+          <button class="faq-item__question" aria-expanded="false">
+            What if I can't keep up?
+            <span class="faq-item__icon">+</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Nobody gets left behind. We run in pace groups — from "easy morning jog" to "I'm-training-for-a-marathon." You'll always have someone next to you pushing at your level.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" id="faq-3">
+          <button class="faq-item__question" aria-expanded="false">
+            Is the Community tier really free?
+            <span class="faq-item__icon">+</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>100% free, forever. We built this club on community, not paywalls. The paid tiers are for people who want structured coaching, exclusive events, and premium merch — but the core Saturday run is always free.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" id="faq-4">
+          <button class="faq-item__question" aria-expanded="false">
+            Where do you run?
+            <span class="faq-item__icon">+</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Routes rotate weekly and are shared in the WhatsApp group every Friday evening. We cover parks, waterfronts, city loops, and occasional trail runs — keeping things fresh every week.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" id="faq-5">
+          <button class="faq-item__question" aria-expanded="false">
+            What happens if it rains?
+            <span class="faq-item__icon">+</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>We run. Rain, harmattan, heat — the 6AM Club doesn't check the weather app. That said, we monitor for genuine safety hazards and will adjust routes or switch to covered fitness sessions if needed.</p>
+          </div>
+        </div>
+
+        <div class="faq-item" id="faq-6">
+          <button class="faq-item__question" aria-expanded="false">
+            Can I cancel my paid membership anytime?
+            <span class="faq-item__icon">+</span>
+          </button>
+          <div class="faq-item__answer">
+            <p>Yes. No contracts, no cancellation fees, no guilt trips. If a paid tier isn't for you, drop down to Community and keep showing up. The road doesn't charge admission.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FINAL CTA ==================== -->
+  <section class="cta-strip" id="final-cta">
+    <div class="container">
+      <p class="label reveal" style="margin-bottom: var(--space-md);">The Next Outing Is Saturday</p>
+      <h2 class="heading-lg cta-strip__title reveal reveal--delay-1">THE ONLY REP<br>THAT COUNTS IS<br><span class="text-accent">SHOWING UP.</span></h2>
+      <p class="body-lg cta-strip__desc reveal reveal--delay-2">Set your alarm. Lace your shoes. We'll see you at 6.</p>
+      <a href="#signup-form" class="btn btn--primary reveal reveal--delay-3" id="final-cta-btn">
+        Claim My Spot
+        <span class="btn__arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <div class="footer__inner">
+        <div class="footer__brand">
+          <div class="nav__logo">
+            <span class="nav__logo-icon">6AM</span>
+            THE CLUB
+          </div>
+          <p class="footer__brand-desc">A weekend morning running and fitness community built on discipline, accountability, and the relentless pursuit of better.</p>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Navigate</h4>
+          <a href="index.html" class="footer__link">Home</a>
+          <a href="outings.html" class="footer__link">The Outings</a>
+          <a href="join.html" class="footer__link">Join the Club</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Community</h4>
+          <a href="https://chat.whatsapp.com/JSNSmbFl1RS0CyjRu9prfk?s=cl&p=i&ilr=0&amv=2" class="footer__link" target="_blank" rel="noopener noreferrer">WhatsApp Group</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__heading">Connect</h4>
+          <a href="https://www.instagram.com/the6amclubofficial?igsh=MTJhOTVyNnNjaHNzNw%3D%3D&utm_source=qr" target="_blank" class="footer__link">Instagram</a>
+          <a href="https://www.tiktok.com/@the6amclub0?_r=1&_t=ZS-97umuLSwM9n" target="_blank" class="footer__link">TikTok</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <p class="body-sm">© 2025 The 6AM Club. Rise before the world does.</p>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/the6amclubofficial?igsh=MTJhOTVyNnNjaHNzNw%3D%3D&utm_source=qr" target="_blank" class="footer__social-link" aria-label="Instagram" id="social-ig">IG</a>
+          <a href="https://www.tiktok.com/@the6amclub0?_r=1&_t=ZS-97umuLSwM9n" target="_blank" class="footer__social-link" aria-label="TikTok" id="social-tk">TK</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== SCRIPTS ==================== -->
+  <script src="app.js"></script>
+</body>
+</html>
