@@ -1903,6 +1903,7 @@ ul, ol {
   .hero {
     height: auto;
     min-height: 100vh;
+    min-height: 100dvh;
     padding-top: 100px;
     padding-bottom: 40px;
     flex-direction: column;
@@ -1948,6 +1949,7 @@ ul, ol {
     right: 0;
     background: rgba(10, 10, 10, 0.95);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     padding: var(--space-xl);
     gap: var(--space-lg);
     border-bottom: 1px solid var(--color-border);
@@ -1956,6 +1958,7 @@ ul, ol {
   .outings-hero {
     height: auto;
     min-height: 80vh;
+    min-height: 80dvh;
     padding-top: 100px;
     padding-bottom: 40px;
     flex-direction: column;
@@ -2017,3 +2020,17 @@ ul, ol {
     min-width: unset;
   }
 }
+
+/* --- Contact & Social Clickable links --- */
+.contact-link {
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.2);
+  transition: color var(--transition-fast), text-decoration-color var(--transition-fast);
+}
+
+.contact-link:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
+}
+

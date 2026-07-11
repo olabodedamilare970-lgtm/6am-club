@@ -11,16 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     heroVideo.muted = true;
     heroVideo.playsInline = true;
     heroVideo.loop = true;
-
-    const playPromise = heroVideo.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Autoplay was prevented, show fallback image
-        heroVideo.style.display = 'none';
-        const fallback = heroVideo.querySelector('img');
-        if (fallback) fallback.style.display = 'block';
-      });
-    }
+    heroVideo.play().catch(() => {
+      // Browser autoplay blocked, poster frame handles visual state
+    });
 
     // Force loop on ended
     heroVideo.addEventListener('ended', () => {
@@ -35,13 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
     outingsHeroVideo.muted = true;
     outingsHeroVideo.playsInline = true;
     outingsHeroVideo.loop = true;
-
-    const playPromise2 = outingsHeroVideo.play();
-    if (playPromise2 !== undefined) {
-      playPromise2.catch(() => {
-        outingsHeroVideo.style.display = 'none';
-      });
-    }
+    outingsHeroVideo.play().catch(() => {
+      // Browser autoplay blocked, poster frame handles visual state
+    });
 
     outingsHeroVideo.addEventListener('ended', () => {
       outingsHeroVideo.currentTime = 0;
@@ -117,43 +106,77 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(update);
   }
 
-  // ─── GALLERY FILTER ───────────────────────────────────────────
-  const filterButtons = document.querySelectorAll('[data-filter]');
-  const galleryCards = document.querySelectorAll('[data-category]');
+  // ─── DYNAMIC GALLERY & FILTER ───────────────────────────────────
+  const galleryGrid = document.getElementById('gallery-grid');
+  if (galleryGrid && typeof OUTINGS_DATA !== 'undefined') {
+    let cardsToShow = 6;
 
-  if (filterButtons.length > 0) {
+    function renderGallery(filter = 'all', limit = cardsToShow) {
+      galleryGrid.innerHTML = '';
+      
+      const filteredData = OUTINGS_DATA.filter(item => filter === 'all' || item.category === filter);
+      const visibleData = filteredData.slice(0, limit);
+
+      visibleData.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'recap-card reveal reveal--visible';
+        card.dataset.category = item.category;
+
+        card.innerHTML = `
+          <div class="recap-card__image-collage">
+            <img src="${item.images[0]}" alt="Week ${item.week} outing" class="collage-main" loading="lazy">
+            <img src="${item.images[1]}" alt="Week ${item.week} outing" loading="lazy">
+            <img src="${item.images[2]}" alt="Week ${item.week} outing" loading="lazy">
+            <img src="${item.images[3]}" alt="Week ${item.week} outing" loading="lazy">
+          </div>
+          <div class="recap-card__body">
+            <h3 class="recap-card__title" style="margin-bottom: 0;">Week ${item.week}</h3>
+          </div>
+        `;
+        galleryGrid.appendChild(card);
+      });
+
+      // Update Load More button visibility
+      const loadMoreBtn = document.getElementById('load-more-btn');
+      if (loadMoreBtn) {
+        if (limit >= filteredData.length) {
+          loadMoreBtn.style.display = 'none';
+        } else {
+          loadMoreBtn.style.display = 'inline-block';
+          loadMoreBtn.innerHTML = 'Load More Outings <span class="btn__arrow">↓</span>';
+          loadMoreBtn.disabled = false;
+        }
+      }
+    }
+
+    // Initial render
+    renderGallery();
+
+    // Filter Buttons logic
+    const filterButtons = document.querySelectorAll('[data-filter]');
     filterButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        // Update active pill
         filterButtons.forEach(b => b.classList.remove('pill--active'));
         btn.classList.add('pill--active');
-
         const filter = btn.dataset.filter;
-
-        galleryCards.forEach(card => {
-          if (filter === 'all' || card.dataset.category === filter) {
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.95)';
-            card.style.display = '';
-
-            requestAnimationFrame(() => {
-              requestAnimationFrame(() => {
-                card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'scale(1)';
-              });
-            });
-          } else {
-            card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-              card.style.display = 'none';
-            }, 300);
-          }
-        });
+        renderGallery(filter, cardsToShow);
       });
     });
+
+    // Real Load More logic
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        loadMoreBtn.innerHTML = 'Loading...';
+        loadMoreBtn.disabled = true;
+        setTimeout(() => {
+          const activeFilterBtn = document.querySelector('[data-filter].pill--active');
+          const activeFilter = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
+          cardsToShow += 6;
+          renderGallery(activeFilter, cardsToShow);
+        }, 800);
+      });
+    }
   }
 
   // ─── FAQ ACCORDION ────────────────────────────────────────────
@@ -349,18 +372,19 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="wa-modal-header">
         <div class="wa-modal-icon">🎉</div>
         <h3 class="wa-modal-title">You're In!</h3>
-        <p class="wa-modal-desc">Step 1 — Join the group. Step 2 — Paste your intro so the crew knows you're coming.</p>
+        <p class="wa-modal-desc" style="color: #ffdd44; font-weight: 600;">⚠️ MUST READ BEFORE JOINING:</p>
+        <p class="wa-modal-desc">WhatsApp group links do NOT support auto-filled texts. Please follow these steps:</p>
       </div>
 
       <div id="wa-msg-box" class="wa-msg-box">${displayMsg}</div>
 
       <div class="wa-btn-group">
-        <button id="wa-copy-btn" class="wa-copy-btn">📋 Copy Message</button>
-        <a id="wa-join-btn" href="${WA_GROUP}" target="_blank" rel="noopener noreferrer" class="wa-join-btn">Join WhatsApp Group →</a>
+        <button id="wa-copy-btn" class="wa-copy-btn">📋 1. Copy Message</button>
+        <a id="wa-join-btn" href="${WA_GROUP}" target="_blank" rel="noopener noreferrer" class="wa-join-btn">2. Join & Paste Details →</a>
       </div>
 
-      <p class="wa-footer-text">
-        After joining, paste the copied message in the group chat.
+      <p class="wa-footer-text" style="color: var(--color-accent); font-weight: 500;">
+        First click "Copy Message", then click "Join & Paste Details", and paste it into the group chat!
       </p>
     `;
 
@@ -448,21 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ─── LOAD MORE BUTTON (simulated) ─────────────────────────────
-  const loadMoreBtn = document.getElementById('load-more-btn');
-
-  if (loadMoreBtn) {
-    loadMoreBtn.addEventListener('click', () => {
-      loadMoreBtn.innerHTML = 'Loading...';
-      loadMoreBtn.disabled = true;
-
-      setTimeout(() => {
-        loadMoreBtn.innerHTML = 'All Outings Loaded ✓';
-        loadMoreBtn.style.borderColor = 'var(--color-accent)';
-        loadMoreBtn.style.color = 'var(--color-accent)';
-      }, 1500);
-    });
-  }
+  // Load more button placeholder (handled dynamically above)
 
   // ─── SMOOTH SCROLL FOR ANCHOR LINKS ───────────────────────────
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
