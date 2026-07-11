@@ -3,10 +3,17 @@
  * 
  * INSTRUCTIONS FOR THE OWNER:
  * To add a new week:
- * 1. Upload your 4 images to the "pictures" folder.
- * 2. Duplicate the block at the top of the OUTINGS_DATA array.
- * 3. Update the week number (e.g. 11), category ("run" or "fitness"), and list the 4 image filenames.
- * 4. Save this file and push it to GitHub. The website will automatically update!
+ * 1. COMPRESS your images first! Upload them to https://tinypng.com or resize
+ *    to under 800px wide before adding them to the "pictures" folder.
+ *    This keeps the site fast on mobile data connections.
+ * 2. Put the compressed images inside the "pictures" folder.
+ * 3. Duplicate the block at the top of the OUTINGS_DATA array below.
+ * 4. Update the week number (e.g. 11), category ("run" or "fitness"),
+ *    and list the 4 image filenames exactly as they appear in the folder.
+ * 5. Save this file and push it to GitHub. The website will automatically update!
+ *
+ * CACHE NOTE: Each time you update this file, also bump the ?v= number in
+ * outings.html script tags (e.g. ?v=3, ?v=4...) so visitors see the new version.
  */
 
 const OUTINGS_DATA = [
