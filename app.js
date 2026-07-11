@@ -5,27 +5,35 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ─── HERO VIDEO FIX — Ensure autoplay & loop ────────────────────
-  const heroVideo = document.getElementById('hero-video');
-  if (heroVideo) {
-    heroVideo.muted = true;
-    heroVideo.playsInline = true;
-    heroVideo.loop = true;
-    heroVideo.play().catch(() => {
-      // Browser autoplay blocked, poster frame handles visual state
+  // ─── VIDEO PLAYBACK HELPER (Handles iOS Low Power Mode Autoplay Block) ───
+  function enableVideoAutoplayWithFallback(videoElement) {
+    if (!videoElement) return;
+
+    videoElement.muted = true;
+    videoElement.playsInline = true;
+    videoElement.loop = true;
+
+    // Attempt native autoplay
+    videoElement.play().catch(() => {
+      // Autoplay blocked (e.g. Low Power Mode). Setup fallback to play on first user interaction.
+      const playOnGesture = () => {
+        videoElement.play().then(() => {
+          // Successfully playing, clean up listeners
+          document.removeEventListener('click', playOnGesture);
+          document.removeEventListener('touchstart', playOnGesture);
+        }).catch(() => {});
+      };
+      document.addEventListener('click', playOnGesture);
+      document.addEventListener('touchstart', playOnGesture);
     });
   }
 
-  // ─── OUTINGS HERO VIDEO FIX ─────────────────────────────────────
+  // Initialize videos
+  const heroVideo = document.getElementById('hero-video');
+  enableVideoAutoplayWithFallback(heroVideo);
+
   const outingsHeroVideo = document.querySelector('.outings-hero__video');
-  if (outingsHeroVideo) {
-    outingsHeroVideo.muted = true;
-    outingsHeroVideo.playsInline = true;
-    outingsHeroVideo.loop = true;
-    outingsHeroVideo.play().catch(() => {
-      // Browser autoplay blocked, poster frame handles visual state
-    });
-  }
+  enableVideoAutoplayWithFallback(outingsHeroVideo);
 
   // ─── SCROLL REVEAL ANIMATION ──────────────────────────────────
   const revealElements = document.querySelectorAll('.reveal');
