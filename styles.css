@@ -1840,6 +1840,31 @@ ul, ol {
   transform: translateY(-2px);
 }
 
+/* Locked state — before user copies */
+.wa-join-btn--locked {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: var(--color-text-muted) !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@keyframes wa-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+@keyframes wa-pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(200,255,0,0.5); }
+  50% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(200,255,0,0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(200,255,0,0); }
+}
+
 .wa-footer-text {
   text-align: center;
   color: #555;

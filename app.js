@@ -368,20 +368,19 @@ document.addEventListener('DOMContentLoaded', () => {
     modal.innerHTML = `
       <div class="wa-modal-header">
         <div class="wa-modal-icon">🎉</div>
-        <h3 class="wa-modal-title">You're In!</h3>
-        <p class="wa-modal-desc" style="color: #ffdd44; font-weight: 600;">⚠️ MUST READ BEFORE JOINING:</p>
-        <p class="wa-modal-desc">WhatsApp group links do NOT support auto-filled texts. Please follow these steps:</p>
+        <h3 class="wa-modal-title">Almost There!</h3>
+        <p class="wa-modal-desc">Follow these <strong style="color:var(--color-accent)">2 steps</strong> — the join button unlocks after you copy.</p>
       </div>
 
       <div id="wa-msg-box" class="wa-msg-box">${displayMsg}</div>
 
       <div class="wa-btn-group">
-        <button id="wa-copy-btn" class="wa-copy-btn">📋 1. Copy Message</button>
-        <a id="wa-join-btn" href="${WA_GROUP}" target="_blank" rel="noopener noreferrer" class="wa-join-btn">2. Join & Paste Details →</a>
+        <button id="wa-copy-btn" class="wa-copy-btn">📋 Step 1: Copy Your Details</button>
+        <a id="wa-join-btn" href="${WA_GROUP}" target="_blank" rel="noopener noreferrer" class="wa-join-btn wa-join-btn--locked" aria-disabled="true" tabindex="-1">🔒 Step 2: Join Group (copy first)</a>
       </div>
 
-      <p class="wa-footer-text" style="color: var(--color-accent); font-weight: 500;">
-        First click "Copy Message", then click "Join & Paste Details", and paste it into the group chat!
+      <p class="wa-footer-text" id="wa-hint-text" style="color: var(--color-text-muted); font-weight: 500;">
+        Copy your details first, then the join button will unlock.
       </p>
     `;
 
@@ -395,18 +394,39 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    let hasCopied = false;
+
+    // Unlock the join button after successful copy
+    const unlockJoinButton = () => {
+      if (hasCopied) return;
+      hasCopied = true;
+
+      const joinBtn = document.getElementById('wa-join-btn');
+      const hintText = document.getElementById('wa-hint-text');
+
+      if (joinBtn) {
+        joinBtn.classList.remove('wa-join-btn--locked');
+        joinBtn.removeAttribute('aria-disabled');
+        joinBtn.removeAttribute('tabindex');
+        joinBtn.innerHTML = '✅ Step 2: Join & Paste Details →';
+        // Pulse animation to draw attention
+        joinBtn.style.animation = 'wa-pulse 0.6s ease';
+      }
+      if (hintText) {
+        hintText.style.color = 'var(--color-accent)';
+        hintText.textContent = 'Details copied! Now join the group and paste your message there.';
+      }
+    };
+
     // Copy function
     const copyTextToClipboard = () => {
+      const copyBtn = document.getElementById('wa-copy-btn');
       navigator.clipboard.writeText(waText).then(() => {
-        const copyBtn = document.getElementById('wa-copy-btn');
         if (copyBtn) {
           copyBtn.textContent = '✓ Copied!';
           copyBtn.classList.add('wa-copy-btn--success');
-          setTimeout(() => {
-            copyBtn.innerHTML = '📋 1. Copy Message';
-            copyBtn.classList.remove('wa-copy-btn--success');
-          }, 2500);
         }
+        unlockJoinButton();
       }).catch(() => {
         // Fallback for older browsers
         const ta = document.createElement('textarea');
@@ -416,24 +436,28 @@ document.addEventListener('DOMContentLoaded', () => {
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        const copyBtn = document.getElementById('wa-copy-btn');
         if (copyBtn) {
           copyBtn.textContent = '✓ Copied!';
           copyBtn.classList.add('wa-copy-btn--success');
-          setTimeout(() => {
-            copyBtn.innerHTML = '📋 1. Copy Message';
-            copyBtn.classList.remove('wa-copy-btn--success');
-          }, 2500);
         }
+        unlockJoinButton();
       });
     };
 
-    // Copy button logic
+    // Copy button click
     document.getElementById('wa-copy-btn').addEventListener('click', copyTextToClipboard);
 
-    // Auto-copy when clicking the join button as a safeguard
-    document.getElementById('wa-join-btn').addEventListener('click', () => {
-      copyTextToClipboard();
+    // Prevent join if not copied yet
+    document.getElementById('wa-join-btn').addEventListener('click', (e) => {
+      if (!hasCopied) {
+        e.preventDefault();
+        // Shake the copy button to tell them to copy first
+        const copyBtn = document.getElementById('wa-copy-btn');
+        if (copyBtn) {
+          copyBtn.style.animation = 'wa-shake 0.4s ease';
+          setTimeout(() => { copyBtn.style.animation = ''; }, 400);
+        }
+      }
     });
 
     // Close on backdrop click
