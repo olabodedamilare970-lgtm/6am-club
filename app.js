@@ -395,16 +395,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Copy button logic
-    document.getElementById('wa-copy-btn').addEventListener('click', () => {
+    // Copy function
+    const copyTextToClipboard = () => {
       navigator.clipboard.writeText(waText).then(() => {
         const copyBtn = document.getElementById('wa-copy-btn');
-        copyBtn.textContent = '✓ Copied!';
-        copyBtn.classList.add('wa-copy-btn--success');
-        setTimeout(() => {
-          copyBtn.innerHTML = '📋 Copy Message';
-          copyBtn.classList.remove('wa-copy-btn--success');
-        }, 2500);
+        if (copyBtn) {
+          copyBtn.textContent = '✓ Copied!';
+          copyBtn.classList.add('wa-copy-btn--success');
+          setTimeout(() => {
+            copyBtn.innerHTML = '📋 1. Copy Message';
+            copyBtn.classList.remove('wa-copy-btn--success');
+          }, 2500);
+        }
       }).catch(() => {
         // Fallback for older browsers
         const ta = document.createElement('textarea');
@@ -415,13 +417,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.execCommand('copy');
         document.body.removeChild(ta);
         const copyBtn = document.getElementById('wa-copy-btn');
-        copyBtn.textContent = '✓ Copied!';
-        copyBtn.classList.add('wa-copy-btn--success');
-        setTimeout(() => {
-          copyBtn.innerHTML = '📋 Copy Message';
-          copyBtn.classList.remove('wa-copy-btn--success');
-        }, 2500);
+        if (copyBtn) {
+          copyBtn.textContent = '✓ Copied!';
+          copyBtn.classList.add('wa-copy-btn--success');
+          setTimeout(() => {
+            copyBtn.innerHTML = '📋 1. Copy Message';
+            copyBtn.classList.remove('wa-copy-btn--success');
+          }, 2500);
+        }
       });
+    };
+
+    // Copy button logic
+    document.getElementById('wa-copy-btn').addEventListener('click', copyTextToClipboard);
+
+    // Auto-copy when clicking the join button as a safeguard
+    document.getElementById('wa-join-btn').addEventListener('click', () => {
+      copyTextToClipboard();
     });
 
     // Close on backdrop click
