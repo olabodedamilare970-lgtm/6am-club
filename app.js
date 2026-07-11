@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     heroVideo.play().catch(() => {
       // Browser autoplay blocked, poster frame handles visual state
     });
-
-    // Force loop on ended
-    heroVideo.addEventListener('ended', () => {
-      heroVideo.currentTime = 0;
-      heroVideo.play().catch(() => { });
-    });
   }
 
   // ─── OUTINGS HERO VIDEO FIX ─────────────────────────────────────
@@ -30,11 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
     outingsHeroVideo.loop = true;
     outingsHeroVideo.play().catch(() => {
       // Browser autoplay blocked, poster frame handles visual state
-    });
-
-    outingsHeroVideo.addEventListener('ended', () => {
-      outingsHeroVideo.currentTime = 0;
-      outingsHeroVideo.play().catch(() => { });
     });
   }
 
