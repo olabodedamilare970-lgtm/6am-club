@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — The 6AM Club</title>
+  <link rel="stylesheet" href="styles.css?v=2">
+  <style>
+    /* Admin Specific Styling extending the Design System */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: var(--color-bg-primary);
+      font-family: var(--font-body);
+    }
+
+    .admin-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: var(--space-xl) var(--space-md);
+      flex: 1;
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: var(--space-2xl);
+    }
+
+    .header-logo {
+      font-family: var(--font-display);
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: -1px;
+      text-transform: uppercase;
+      margin-bottom: var(--space-xs);
+    }
+
+    .header-logo span {
+      color: var(--color-accent);
+      text-shadow: var(--shadow-glow);
+    }
+
+    /* Glassmorphism Card System */
+    .admin-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      box-shadow: var(--shadow-card);
+      transition: border-color var(--transition-base), box-shadow var(--transition-base);
+    }
+
+    .admin-card:hover {
+      border-color: var(--color-border-hover);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: var(--space-lg);
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xs);
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-sm) var(--space-md);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: border-color var(--transition-fast);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--color-accent);
+    }
+
+    /* Buttons */
+    .btn-admin {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-accent);
+      color: var(--color-bg-primary);
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: var(--space-sm) var(--space-lg);
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      transition: background var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
+      gap: var(--space-sm);
+    }
+
+    .btn-admin:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-2px);
+    }
+
+    .btn-admin:disabled {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-muted);
+      cursor: not-allowed;
+      transform: none;
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-danger {
+      background: var(--color-danger);
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #ff2222;
+    }
+
+    /* Login Screen */
+    .login-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 80vh;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    /* Grid dashboard */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Status Badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      gap: 4px;
+    }
+
+    .status-disconnected {
+      background: rgba(255, 68, 68, 0.15);
+      color: var(--color-danger);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+    }
+
+    .status-connected {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--color-success);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    /* Category Toggle Switches */
+    .category-selector {
+      display: flex;
+      background: var(--color-bg-tertiary);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      border: 1px solid var(--color-border);
+    }
+
+    .category-option {
+      flex: 1;
+      text-align: center;
+      padding: var(--space-sm);
+      cursor: pointer;
+      font-weight: 700;
+      border-radius: var(--radius-sm);
+      transition: background var(--transition-fast), color var(--transition-fast);
+      user-select: none;
+    }
+
+    .category-option.active {
+      background: var(--color-accent);
+      color: var(--color-bg-primary);
+    }
+
+    /* Guidelines List */
+    .guide-item {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+      font-size: 0.9rem;
+    }
+
+    .guide-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 800;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .guide-green { background: #00ff88; color: #000; }
+    .guide-yellow { background: #ffbb00; color: #000; }
+    .guide-red { background: #ff4444; color: #fff; }
+
+    /* Upload Slots Grid */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      margin-top: var(--space-md);
+    }
+
+    @media (max-width: 600px) {
+      .upload-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .upload-slot {
+      border: 2px dashed var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      text-align: center;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+      position: relative;
+      background: rgba(255, 255, 255, 0.01);
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .upload-slot:hover {
+      border-color: var(--color-accent);
+      background: rgba(200, 255, 0, 0.02);
+    }
+
+    .upload-slot.drag-over {
+      border-color: var(--color-accent);
+      background: rgba(200, 255, 0, 0.08);
+    }
+
+    .upload-slot input[type="file"] {
+      display: none;
+    }
+
+    .preview-img {
+      max-width: 100%;
+      max-height: 100px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      margin-bottom: var(--space-xs);
+    }
+
+    .slot-meta {
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .slot-badge {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .remove-btn {
+      position: absolute;
+      bottom: var(--space-sm);
+      right: var(--space-sm);
+      background: rgba(255, 68, 68, 0.2);
+      color: var(--color-danger);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .remove-btn:hover {
+      background: var(--color-danger);
+      color: #fff;
+    }
+
+    /* Readiness Bar */
+    .readiness-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--space-lg);
+      padding: var(--space-md);
+      background: var(--color-bg-tertiary);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+    }
+
+    .readiness-dots {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .readiness-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--color-border);
+      transition: background var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .readiness-dot.ready {
+      background: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+    }
+
+    .readiness-dot.warning {
+      background: #ffbb00;
+      box-shadow: 0 0 8px #ffbb00;
+    }
+
+    .readiness-dot.error {
+      background: var(--color-danger);
+      box-shadow: 0 0 8px var(--color-danger);
+    }
+
+    /* Publishing Progress Logs */
+    .log-container {
+      background: #000;
+      border-radius: var(--radius-sm);
+      padding: var(--space-md);
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #00ff88;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid var(--color-border);
+      margin-top: var(--space-md);
+    }
+
+    .log-line {
+      margin-bottom: var(--space-xs);
+    }
+
+    .log-line.error {
+      color: var(--color-danger);
+    }
+
+    /* Progress bar */
+    .progress-bar-outer {
+      width: 100%;
+      height: 6px;
+      background: var(--color-bg-tertiary);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-top: var(--space-sm);
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      width: 0%;
+      background: var(--color-accent);
+      box-shadow: var(--shadow-glow);
+      transition: width var(--transition-base);
+    }
+
+    /* Success state card */
+    .success-card {
+      background: rgba(0, 255, 136, 0.05);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      text-align: center;
+      margin-top: var(--space-lg);
+      display: none;
+    }
+
+    .success-icon {
+      font-size: 3rem;
+      margin-bottom: var(--space-md);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <div class="header-section">
+      <h1 class="header-logo">The 6AM Club <span>Admin</span></h1>
+      <p style="color: var(--color-text-secondary)">Manage and publish outings directly to the live site</p>
+    </div>
+
+    <!-- 1. LOGIN SCREEN -->
+    <div id="login-screen" class="login-wrapper">
+      <div class="admin-card login-card">
+        <h2 class="card-title" style="justify-content: center;">🔒 Enter Admin Password</h2>
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="form-group">
+            <input type="password" id="admin-password" class="form-control" placeholder="Password" required autofocus autocomplete="current-password">
+          </div>
+          <div id="login-error" style="color: var(--color-danger); font-size: 0.875rem; margin-top: -10px; margin-bottom: 10px; display: none;">
+            Incorrect password. Try again.
+          </div>
+          <button type="submit" class="btn-admin" style="width: 100%;">Access Dashboard</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. DASHBOARD PANEL (HIDDEN BY DEFAULT) -->
+    <div id="dashboard-panel" style="display: none;">
+      
+      <!-- Top Row Dashboard Grid -->
+      <div class="dashboard-grid">
+        
+        <!-- Outing Week Information & Guidelines -->
+        <div class="admin-card">
+          <h2 class="card-title">📅 New Outing details</h2>
+          <div class="form-group">
+            <label for="outing-week">Week Number</label>
+            <input type="number" id="outing-week" class="form-control" min="1" placeholder="e.g. 11">
+          </div>
+          <div class="form-group">
+            <label>Outing Category</label>
+            <div class="category-selector">
+              <div id="cat-run" class="category-option active" onclick="setCategory('run')">🏃‍♂️ Run</div>
+              <div id="cat-fitness" class="category-option" onclick="setCategory('fitness')">💪 Fitness</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Photo Upload Guidelines -->
+        <div class="admin-card">
+          <h2 class="card-title">📸 Photo Upload Guidelines</h2>
+          <div class="guide-item">
+            <span class="guide-badge guide-green">GREEN</span>
+            <span>Under 500KB - <strong>Perfect!</strong> Fast load times for mobile users.</span>
+          </div>
+          <div class="guide-item">
+            <span class="guide-badge guide-yellow">YELLOW</span>
+            <span>500KB to 1.5MB - Works, but we'll try to auto-compress it for you.</span>
+          </div>
+          <div class="guide-item">
+            <span class="guide-badge guide-red">RED</span>
+            <span>Over 1.5MB - Cannot upload, please compress first.</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Collapsible Developer Settings -->
+      <details style="margin-bottom: var(--space-lg); border: 1px dashed var(--color-border); border-radius: var(--radius-md); padding: var(--space-md); background: rgba(255,255,255,0.01);">
+        <summary style="cursor: pointer; font-size: 0.9rem; font-weight: 700; color: var(--color-text-secondary); outline: none; user-select: none;">
+          ⚙️ Developer Settings (GitHub Connection Setup)
+          <span id="conn-badge" class="status-badge status-disconnected" style="margin-left: var(--space-sm);">🔴 Disconnected</span>
+        </summary>
+        <div style="margin-top: var(--space-md);">
+          <p style="font-size: 0.85rem; color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+            This connection only needs to be configured once per browser. Enter a GitHub token so the site can update automatically.
+          </p>
+          <div class="form-group">
+            <label for="gh-token">Personal Access Token (PAT)</label>
+            <input type="password" id="gh-token" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          </div>
+          <div class="form-group">
+            <label for="gh-owner">Repository Owner</label>
+            <input type="text" id="gh-owner" class="form-control" value="olabodedamilare970-lgtm">
+          </div>
+          <div class="form-group">
+            <label for="gh-repo">Repository Name</label>
+            <input type="text" id="gh-repo" class="form-control" value="6am-club">
+          </div>
+          <div style="display: flex; gap: var(--space-sm)">
+            <button onclick="saveAndTestConfig()" class="btn-admin">Save & Test Connection</button>
+            <button onclick="clearConfig()" class="btn-admin btn-danger">Clear Token</button>
+          </div>
+        </div>
+      </details>
+
+
+      <!-- Image Upload Grid -->
+      <div class="admin-card">
+        <h2 class="card-title">🖼️ Upload Outing Photos (Exactly 4 Required)</h2>
+        <div class="upload-grid">
+          
+          <!-- Slot 1 -->
+          <div class="upload-slot" id="slot-1" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 1)" onclick="triggerInput(1)">
+            <span class="slot-badge" id="badge-1">Empty</span>
+            <input type="file" id="file-1" accept="image/*" onchange="handleFileSelect(event, 1)">
+            <div class="slot-content" id="content-1">
+              <span style="font-size: 2rem;">📸</span>
+              <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo 1</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+            </div>
+          </div>
+
+          <!-- Slot 2 -->
+          <div class="upload-slot" id="slot-2" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 2)" onclick="triggerInput(2)">
+            <span class="slot-badge" id="badge-2">Empty</span>
+            <input type="file" id="file-2" accept="image/*" onchange="handleFileSelect(event, 2)">
+            <div class="slot-content" id="content-2">
+              <span style="font-size: 2rem;">📸</span>
+              <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo 2</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+            </div>
+          </div>
+
+          <!-- Slot 3 -->
+          <div class="upload-slot" id="slot-3" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 3)" onclick="triggerInput(3)">
+            <span class="slot-badge" id="badge-3">Empty</span>
+            <input type="file" id="file-3" accept="image/*" onchange="handleFileSelect(event, 3)">
+            <div class="slot-content" id="content-3">
+              <span style="font-size: 2rem;">📸</span>
+              <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo 3</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+            </div>
+          </div>
+
+          <!-- Slot 4 -->
+          <div class="upload-slot" id="slot-4" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 4)" onclick="triggerInput(4)">
+            <span class="slot-badge" id="badge-4">Empty</span>
+            <input type="file" id="file-4" accept="image/*" onchange="handleFileSelect(event, 4)">
+            <div class="slot-content" id="content-4">
+              <span style="font-size: 2rem;">📸</span>
+              <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo 4</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Readiness Bar -->
+        <div class="readiness-container">
+          <div style="display: flex; align-items: center; gap: var(--space-md);">
+            <span style="font-weight: 700; font-size: 0.9rem;">Upload Readiness:</span>
+            <div class="readiness-dots">
+              <div id="dot-1" class="readiness-dot"></div>
+              <div id="dot-2" class="readiness-dot"></div>
+              <div id="dot-3" class="readiness-dot"></div>
+              <div id="dot-4" class="readiness-dot"></div>
+            </div>
+          </div>
+          
+          <button id="publish-btn" onclick="publishOuting()" class="btn-admin" disabled>
+            🚀 Publish Outing
+          </button>
+        </div>
+
+        <!-- Progress Tracker Details -->
+        <div id="publish-progress-section" style="display: none; margin-top: var(--space-lg);">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px;">
+            <span>Publishing Progress</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-bar-outer">
+            <div id="progress-bar" class="progress-bar-inner"></div>
+          </div>
+          <div id="log-console" class="log-container">
+            <div class="log-line">Console initialized. Ready to upload.</div>
+          </div>
+        </div>
+
+        <!-- Success Banner -->
+        <div id="success-banner" class="success-card">
+          <div class="success-icon">🎉</div>
+          <h3 style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-success); margin-bottom: var(--space-xs);">Successfully Published!</h3>
+          <p style="color: var(--color-text-secondary); margin-bottom: var(--space-md);">
+            Images uploaded and outings config file updated.
+          </p>
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: var(--space-sm); font-size: 0.875rem; color: var(--color-accent); display: inline-block;">
+            ⏳ Render auto-deploy triggered. The new outing will appear live in ~2 minutes!
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="outings-data.js?v=2"></script>
+  <script>
+    // State management
+    let passwordSessionKey = '6amclub_admin_logged_in';
+    let currentCategory = 'run';
+    let slotFiles = { 1: null, 2: null, 3: null, 4: null };
+    let gitConfig = { token: '', owner: 'olabodedamilare970-lgtm', repo: '6am-club' };
+    let isConnected = false;
+
+    // Default password check
+    window.addEventListener('load', () => {
+      // Check session
+      if (sessionStorage.getItem(passwordSessionKey) === 'true') {
+        showDashboard();
+      }
+
+      // Load config from localStorage
+      const savedToken = localStorage.getItem('6am_gh_token');
+      const savedOwner = localStorage.getItem('6am_gh_owner') || 'olabodedamilare970-lgtm';
+      const savedRepo = localStorage.getItem('6am_gh_repo') || '6am-club';
+
+      if (savedToken) {
+        document.getElementById('gh-token').value = savedToken;
+        gitConfig.token = savedToken;
+      }
+      document.getElementById('gh-owner').value = savedOwner;
+      document.getElementById('gh-repo').value = savedRepo;
+      gitConfig.owner = savedOwner;
+      gitConfig.repo = savedRepo;
+
+      if (savedToken) {
+        testGitHubConnection();
+      }
+
+      // Auto-populate next week number
+      if (typeof OUTINGS_DATA !== 'undefined' && OUTINGS_DATA.length > 0) {
+        const maxWeek = Math.max(...OUTINGS_DATA.map(o => o.week));
+        document.getElementById('outing-week').value = maxWeek + 1;
+      } else {
+        document.getElementById('outing-week').value = 1;
+      }
+
+      // Add dynamic verification listener to required fields
+      document.getElementById('outing-week').addEventListener('input', validateFormState);
+    });
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const pw = document.getElementById('admin-password').value;
+      if (pw === '6amclub2025') {
+        sessionStorage.setItem(passwordSessionKey, 'true');
+        document.getElementById('login-error').style.display = 'none';
+        showDashboard();
+      } else {
+        document.getElementById('login-error').style.display = 'block';
+      }
+    }
+
+    function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard-panel').style.display = 'block';
+    }
+
+    function setCategory(cat) {
+      currentCategory = cat;
+      document.getElementById('cat-run').classList.toggle('active', cat === 'run');
+      document.getElementById('cat-fitness').classList.toggle('active', cat === 'fitness');
+      validateFormState();
+    }
+
+    // Save and Test GitHub Configuration
+    async function saveAndTestConfig() {
+      const token = document.getElementById('gh-token').value.trim();
+      const owner = document.getElementById('gh-owner').value.trim();
+      const repo = document.getElementById('gh-repo').value.trim();
+
+      if (!token) {
+        alert('Please enter a GitHub Personal Access Token.');
+        return;
+      }
+
+      gitConfig = { token, owner, repo };
+      localStorage.setItem('6am_gh_token', token);
+      localStorage.setItem('6am_gh_owner', owner);
+      localStorage.setItem('6am_gh_repo', repo);
+
+      await testGitHubConnection();
+    }
+
+    function clearConfig() {
+      localStorage.removeItem('6am_gh_token');
+      document.getElementById('gh-token').value = '';
+      gitConfig.token = '';
+      isConnected = false;
+      updateConnectionStatus(false);
+      validateFormState();
+    }
+
+    async function testGitHubConnection() {
+      const { token, owner, repo } = gitConfig;
+      updateConnectionStatus(false, 'Verifying...');
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+
+        if (res.ok) {
+          isConnected = true;
+          updateConnectionStatus(true);
+        } else {
+          isConnected = false;
+          updateConnectionStatus(false);
+        }
+      } catch (err) {
+        isConnected = false;
+        updateConnectionStatus(false);
+      }
+      validateFormState();
+    }
+
+    function updateConnectionStatus(connected, text) {
+      const badge = document.getElementById('conn-badge');
+      if (connected) {
+        badge.className = 'status-badge status-connected';
+        badge.textContent = '🟢 Connected';
+      } else {
+        badge.className = 'status-badge status-disconnected';
+        badge.textContent = text || '🔴 Disconnected';
+      }
+    }
+
+    // Upload Slots Handling
+    function triggerInput(slot) {
+      document.getElementById(`file-${slot}`).click();
+    }
+
+    function preventDefault(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function handleDragOver(e) {
+      preventDefault(e);
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      preventDefault(e);
+      e.currentTarget.classList.remove('drag-over');
+    }
+
+    function handleDrop(e, slot) {
+      preventDefault(e);
+      e.currentTarget.classList.remove('drag-over');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        processSelectedFile(files[0], slot);
+      }
+    }
+
+    function handleFileSelect(e, slot) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        processSelectedFile(files[0], slot);
+      }
+    }
+
+    // Canvas image scaling & compression to JPEG
+    function processSelectedFile(file, slot) {
+      if (!file.type.startsWith('image/')) {
+        updateSlotError(slot, 'Not an image file');
+        return;
+      }
+
+      // Set up file reader to convert to image & compress
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          
+          // Max dimension 1200px to maintain quality + ensure compressed size is very small
+          const MAX_DIM = 1200;
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to JPEG with quality 0.85
+          canvas.toBlob((blob) => {
+            const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpeg", {
+              type: "image/jpeg",
+              lastModified: Date.now()
+            });
+
+            saveFileToSlot(compressedFile, slot, event.target.result);
+          }, 'image/jpeg', 0.85);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveFileToSlot(file, slot, previewDataUrl) {
+      slotFiles[slot] = file;
+      
+      const contentDiv = document.getElementById(`content-${slot}`);
+      const badge = document.getElementById(`badge-${slot}`);
+      const dot = document.getElementById(`dot-${slot}`);
+
+      // Size classification
+      const sizeKB = file.size / 1024;
+      let sizeText = sizeKB.toFixed(0) + ' KB';
+      
+      contentDiv.innerHTML = `
+        <img class="preview-img" src="${previewDataUrl}" alt="Preview">
+        <div class="slot-meta" title="${file.name}">${file.name}</div>
+        <div class="slot-meta">${sizeText}</div>
+        <button class="remove-btn" onclick="removeSlotFile(event, ${slot})">Remove</button>
+      `;
+
+      if (sizeKB < 500) {
+        badge.textContent = 'Perfect!';
+        badge.style.background = '#00ff88';
+        badge.style.color = '#000';
+        dot.className = 'readiness-dot ready';
+      } else if (sizeKB <= 1500) {
+        badge.textContent = 'Good';
+        badge.style.background = '#ffbb00';
+        badge.style.color = '#000';
+        dot.className = 'readiness-dot warning';
+      } else {
+        badge.textContent = 'Too Large';
+        badge.style.background = '#ff4444';
+        badge.style.color = '#fff';
+        dot.className = 'readiness-dot error';
+      }
+
+      validateFormState();
+    }
+
+    function updateSlotError(slot, message) {
+      slotFiles[slot] = null;
+      const contentDiv = document.getElementById(`content-${slot}`);
+      const badge = document.getElementById(`badge-${slot}`);
+      const dot = document.getElementById(`dot-${slot}`);
+
+      contentDiv.innerHTML = `
+        <span style="font-size: 2rem;">⚠️</span>
+        <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600; color: var(--color-danger);">${message}</p>
+        <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Try another file</p>
+      `;
+
+      badge.textContent = 'Invalid';
+      badge.style.background = '#ff4444';
+      badge.style.color = '#fff';
+      dot.className = 'readiness-dot error';
+      
+      validateFormState();
+    }
+
+    function removeSlotFile(e, slot) {
+      if (e) {
+        e.stopPropagation();
+      }
+      slotFiles[slot] = null;
+
+      const contentDiv = document.getElementById(`content-${slot}`);
+      const badge = document.getElementById(`badge-${slot}`);
+      const dot = document.getElementById(`dot-${slot}`);
+
+      contentDiv.innerHTML = `
+        <span style="font-size: 2rem;">📸</span>
+        <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo ${slot}</p>
+        <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+      `;
+
+      badge.textContent = 'Empty';
+      badge.style.background = '';
+      badge.style.color = '';
+      dot.className = 'readiness-dot';
+
+      validateFormState();
+    }
+
+    function validateFormState() {
+      const publishBtn = document.getElementById('publish-btn');
+      const weekVal = document.getElementById('outing-week').value;
+      
+      // All slots must have a file, and no slot can be "Too Large" (>1500KB)
+      let allSlotsReady = true;
+      for (let s = 1; s <= 4; s++) {
+        if (!slotFiles[s] || slotFiles[s].size / 1024 > 1500) {
+          allSlotsReady = false;
+        }
+      }
+
+      if (allSlotsReady && weekVal && isConnected) {
+        publishBtn.removeAttribute('disabled');
+      } else {
+        publishBtn.setAttribute('disabled', 'true');
+      }
+    }
+
+    // Logger
+    function logMsg(text, type = 'info') {
+      const consoleDiv = document.getElementById('log-console');
+      const line = document.createElement('div');
+      line.className = 'log-line' + (type === 'error' ? ' error' : '');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+      consoleDiv.appendChild(line);
+      consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+
+    function updateProgressBar(percent) {
+      document.getElementById('progress-bar').style.width = `${percent}%`;
+      document.getElementById('progress-percent').textContent = `${percent}%`;
+    }
+
+    // Base64 helper (with file API reader support)
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          // Extract base64 part
+          const base64Str = reader.result.split(',')[1];
+          resolve(base64Str);
+        };
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    // GitHub API Core caller
+    async function ghRequest(path, options = {}) {
+      const { token, owner, repo } = gitConfig;
+      const url = `https://api.github.com/repos/${owner}/${repo}/${path}`;
+      
+      const defaultHeaders = {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      };
+
+      const res = await fetch(url, {
+        ...options,
+        headers: {
+          ...defaultHeaders,
+          ...options.headers
+        }
+      });
+
+      if (!res.ok) {
+        const errDetails = await res.json().catch(() => ({}));
+        throw new Error(errDetails.message || `HTTP ${res.status}`);
+      }
+
+      return await res.json();
+    }
+
+    // main Publish workflow
+    async function publishOuting() {
+      const weekVal = document.getElementById('outing-week').value;
+      
+      document.getElementById('publish-btn').disabled = true;
+      document.getElementById('success-banner').style.display = 'none';
+      
+      const progressSection = document.getElementById('publish-progress-section');
+      progressSection.style.display = 'block';
+      
+      const consoleDiv = document.getElementById('log-console');
+      consoleDiv.innerHTML = '';
+      
+      logMsg('Starting outing publication workflow...');
+      updateProgressBar(5);
+
+      try {
+        // Step 1: Upload the four compressed images
+        for (let s = 1; s <= 4; s++) {
+          const file = slotFiles[s];
+          const filename = `week-${weekVal}-photo-${s}.jpeg`;
+          const path = `pictures/${filename}`;
+          
+          logMsg(`Preparing Photo ${s} (${(file.size/1024).toFixed(0)} KB)...`);
+          const base64Data = await fileToBase64(file);
+          
+          // Check if photo exists first to get sha (in case they are replacing an already uploaded week)
+          let existingSha = null;
+          try {
+            const checkData = await ghRequest(`contents/${path}`);
+            existingSha = checkData.sha;
+            logMsg(`Found existing photo ${filename}, it will be replaced.`);
+          } catch(e) {
+            // File does not exist, safe to write new
+          }
+
+          logMsg(`Uploading Photo ${s} as pictures/${filename}...`);
+          
+          const payload = {
+            message: `Upload ${filename} via Admin Panel`,
+            content: base64Data
+          };
+          if (existingSha) payload.sha = existingSha;
+
+          await ghRequest(`contents/${path}`, {
+            method: 'PUT',
+            body: JSON.stringify(payload)
+          });
+
+          logMsg(`Photo ${s} uploaded successfully!`);
+          updateProgressBar(10 + (s * 15)); // 25%, 40%, 55%, 70%
+        }
+
+        // Step 2: Fetch and update outings-data.js
+        logMsg('Fetching current outings-data.js from repository...');
+        const outingsFile = await ghRequest('contents/outings-data.js');
+        const outingsSha = outingsFile.sha;
+        
+        // Decode outings content
+        // Handle utf-8 encoding safely
+        const decodedContent = decodeURIComponent(escape(atob(outingsFile.content.replace(/\s/g, ''))));
+        logMsg('outings-data.js fetched and decoded successfully.');
+        updateProgressBar(80);
+
+        // Prepend new week data right after "const OUTINGS_DATA = ["
+        const searchStr = 'const OUTINGS_DATA = [';
+        const index = decodedContent.indexOf(searchStr);
+        if (index === -1) {
+          throw new Error('Could not parse outings-data.js (array declaration not found).');
+        }
+
+        const insertIndex = index + searchStr.length;
+        const before = decodedContent.substring(0, insertIndex);
+        const after = decodedContent.substring(insertIndex);
+
+        const newWeekEntry = `\n  {\n    week: ${weekVal},\n    category: "${currentCategory}",\n    images: [\n      "pictures/week-${weekVal}-photo-1.jpeg",\n      "pictures/week-${weekVal}-photo-2.jpeg",\n      "pictures/week-${weekVal}-photo-3.jpeg",\n      "pictures/week-${weekVal}-photo-4.jpeg"\n    ]\n  },`;
+
+        const updatedContent = before + newWeekEntry + after;
+        
+        // Encode updated content to base64 safely
+        const encodedContent = btoa(unescape(encodeURIComponent(updatedContent)));
+
+        logMsg(`Writing updated outings-data.js with new Week ${weekVal}...`);
+        
+        await ghRequest('contents/outings-data.js', {
+          method: 'PUT',
+          body: JSON.stringify({
+            message: `Add Week ${weekVal} outings metadata via Admin Panel`,
+            content: encodedContent,
+            sha: outingsSha
+          })
+        });
+
+        logMsg('outings-data.js updated successfully!');
+        updateProgressBar(100);
+        
+        // Hide progress details slowly and show success
+        setTimeout(() => {
+          document.getElementById('success-banner').style.display = 'block';
+          document.getElementById('publish-btn').disabled = false;
+          // Clear files to prevent accidental re-upload
+          for(let s=1; s<=4; s++) {
+            removeSlotFile(null, s);
+          }
+          // Increment week
+          document.getElementById('outing-week').value = parseInt(weekVal) + 1;
+        }, 1000);
+
+      } catch (err) {
+        logMsg(`Error: ${err.message}`, 'error');
+        console.error(err);
+        document.getElementById('publish-btn').disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
