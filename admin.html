@@ -966,8 +966,8 @@
       });
     }
 
-    // GitHub API Core caller
-    async function ghRequest(path, options = {}) {
+    // GitHub API Core caller with automatic retry on network failure
+    async function ghRequest(path, options = {}, retries = 3) {
       const { token, owner, repo } = gitConfig;
       const url = `https://api.github.com/repos/${owner}/${repo}/${path}`;
       
@@ -977,20 +977,30 @@
         'Content-Type': 'application/json'
       };
 
-      const res = await fetch(url, {
-        ...options,
-        headers: {
-          ...defaultHeaders,
-          ...options.headers
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const res = await fetch(url, {
+            ...options,
+            headers: {
+              ...defaultHeaders,
+              ...options.headers
+            }
+          });
+
+          if (!res.ok) {
+            const errDetails = await res.json().catch(() => ({}));
+            throw new Error(errDetails.message || `HTTP ${res.status}`);
+          }
+
+          return await res.json();
+
+        } catch (err) {
+          const isLastAttempt = attempt === retries;
+          if (isLastAttempt) throw err;
+          logMsg(`⚠️ Network blip on attempt ${attempt}, retrying in 2s...`);
+          await new Promise(r => setTimeout(r, 2000));
         }
-      });
-
-      if (!res.ok) {
-        const errDetails = await res.json().catch(() => ({}));
-        throw new Error(errDetails.message || `HTTP ${res.status}`);
       }
-
-      return await res.json();
     }
 
     // main Publish workflow
