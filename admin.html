@@ -803,8 +803,8 @@
           let width = img.width;
           let height = img.height;
           
-          // Max dimension 1200px to maintain quality + ensure compressed size is very small
-          const MAX_DIM = 1200;
+          // Max dimension 800px to ensure compressed size is extremely small and uploads fast
+          const MAX_DIM = 800;
           if (width > MAX_DIM || height > MAX_DIM) {
             if (width > height) {
               height = Math.round((height * MAX_DIM) / width);
@@ -821,7 +821,7 @@
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
 
-          // Convert to JPEG with quality 0.85
+          // Convert to JPEG with quality 0.80 for optimal web compression
           canvas.toBlob((blob) => {
             const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".jpeg", {
               type: "image/jpeg",
@@ -829,7 +829,7 @@
             });
 
             saveFileToSlot(compressedFile, slot, event.target.result);
-          }, 'image/jpeg', 0.85);
+          }, 'image/jpeg', 0.80);
         };
         img.src = event.target.result;
       };
@@ -1020,8 +1020,12 @@
       updateProgressBar(5);
 
       try {
-        // Step 1: Upload the four compressed images
-        for (let s = 1; s <= 4; s++) {
+        // Step 1: Upload the four compressed images concurrently for speed
+        logMsg('Uploading all 4 photos concurrently... (this makes it much faster)');
+        
+        let completedUploads = 0;
+        
+        const uploadPromises = [1, 2, 3, 4].map(async (s) => {
           const file = slotFiles[s];
           const filename = `week-${weekVal}-photo-${s}.jpeg`;
           const path = `pictures/${filename}`;
@@ -1034,13 +1038,11 @@
           try {
             const checkData = await ghRequest(`contents/${path}`);
             existingSha = checkData.sha;
-            logMsg(`Found existing photo ${filename}, it will be replaced.`);
+            logMsg(`Found existing photo ${filename}, replacing it.`);
           } catch(e) {
             // File does not exist, safe to write new
           }
 
-          logMsg(`Uploading Photo ${s} as pictures/${filename}...`);
-          
           const payload = {
             message: `Upload ${filename} via Admin Panel`,
             content: base64Data
@@ -1052,9 +1054,16 @@
             body: JSON.stringify(payload)
           });
 
-          logMsg(`Photo ${s} uploaded successfully!`);
-          updateProgressBar(10 + (s * 15)); // 25%, 40%, 55%, 70%
-        }
+          logMsg(`✅ Photo ${s} uploaded successfully!`);
+          
+          // Update progress dynamically
+          completedUploads++;
+          updateProgressBar(5 + (completedUploads * 17)); // 22%, 39%, 56%, 73%
+        });
+
+        // Wait for all 4 uploads to finish
+        await Promise.all(uploadPromises);
+        logMsg('All photos uploaded successfully!');
 
         // Step 2: Fetch and update outings-data.js
         logMsg('Fetching current outings-data.js from repository...');
