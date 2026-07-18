@@ -143,6 +143,34 @@ document.addEventListener('DOMContentLoaded', () => {
           loadMoreBtn.disabled = false;
         }
       }
+      
+      initCarouselAutoScroll();
+    }
+
+    let carouselIntervals = [];
+
+    function initCarouselAutoScroll() {
+      // Clear existing intervals
+      carouselIntervals.forEach(clearInterval);
+      carouselIntervals = [];
+
+      const carousels = document.querySelectorAll('.recap-card__carousel');
+      carousels.forEach(carousel => {
+        const interval = setInterval(() => {
+          // Pause if user is hovering or interacting
+          if (carousel.matches(':hover') || carousel.matches(':active')) return;
+
+          const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+          if (carousel.scrollLeft >= maxScroll - 5) {
+            carousel.scrollTo({ left: 0, behavior: 'smooth' });
+          } else {
+            const img = carousel.querySelector('img');
+            const scrollAmt = img ? img.clientWidth : carousel.clientWidth * 0.85;
+            carousel.scrollBy({ left: scrollAmt, behavior: 'smooth' });
+          }
+        }, 1500);
+        carouselIntervals.push(interval);
+      });
     }
 
     // Initial render
