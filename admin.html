@@ -519,7 +519,7 @@
 
       <!-- Image Upload Grid -->
       <div class="admin-card">
-        <h2 class="card-title">🖼️ Upload Outing Photos (Exactly 4 Required)</h2>
+        <h2 class="card-title">🖼️ Upload Outing Photos (Up to 6 Photos)</h2>
         <div class="upload-grid">
           
           <!-- Slot 1 -->
@@ -566,6 +566,28 @@
             </div>
           </div>
 
+          <!-- Slot 5 -->
+          <div class="upload-slot" id="slot-5" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 5)" onclick="triggerInput(5)">
+            <span class="slot-badge" id="badge-5">Empty</span>
+            <input type="file" id="file-5" accept="image/*" onchange="handleFileSelect(event, 5)">
+            <div class="slot-content" id="content-5">
+              <span style="font-size: 2rem;">📸</span>
+              <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo 5</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+            </div>
+          </div>
+
+          <!-- Slot 6 -->
+          <div class="upload-slot" id="slot-6" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 6)" onclick="triggerInput(6)">
+            <span class="slot-badge" id="badge-6">Empty</span>
+            <input type="file" id="file-6" accept="image/*" onchange="handleFileSelect(event, 6)">
+            <div class="slot-content" id="content-6">
+              <span style="font-size: 2rem;">📸</span>
+              <p style="font-size: 0.9rem; margin-top: 5px; font-weight: 600;">Photo 6</p>
+              <p style="font-size: 0.75rem; color: var(--color-text-secondary);">Click or drag image here</p>
+            </div>
+          </div>
+
         </div>
 
         <!-- Readiness Bar -->
@@ -577,6 +599,8 @@
               <div id="dot-2" class="readiness-dot"></div>
               <div id="dot-3" class="readiness-dot"></div>
               <div id="dot-4" class="readiness-dot"></div>
+              <div id="dot-5" class="readiness-dot"></div>
+              <div id="dot-6" class="readiness-dot"></div>
             </div>
           </div>
           
@@ -922,15 +946,19 @@
       const publishBtn = document.getElementById('publish-btn');
       const weekVal = document.getElementById('outing-week').value;
       
-      // All slots must have a file, and no slot can be "Too Large" (>1500KB)
-      let allSlotsReady = true;
-      for (let s = 1; s <= 4; s++) {
-        if (!slotFiles[s] || slotFiles[s].size / 1024 > 1500) {
-          allSlotsReady = false;
+      // At least one slot must have a file, and no slot can be "Too Large" (>1500KB)
+      let hasFile = false;
+      let noLargeFiles = true;
+      for (let s = 1; s <= 6; s++) {
+        if (slotFiles[s]) {
+          hasFile = true;
+          if (slotFiles[s].size / 1024 > 1500) {
+            noLargeFiles = false;
+          }
         }
       }
 
-      if (allSlotsReady && weekVal && isConnected) {
+      if (hasFile && noLargeFiles && weekVal && isConnected) {
         publishBtn.removeAttribute('disabled');
       } else {
         publishBtn.setAttribute('disabled', 'true');
@@ -1020,12 +1048,15 @@
       updateProgressBar(5);
 
       try {
-        // Step 1: Upload the four compressed images concurrently for speed
-        logMsg('Uploading all 4 photos concurrently... (this makes it much faster)');
+        const activeSlots = [1, 2, 3, 4, 5, 6].filter(s => slotFiles[s]);
+
+        // Step 1: Upload the compressed images concurrently
+        logMsg(`Uploading ${activeSlots.length} photos concurrently... (this makes it much faster)`);
         
         let completedUploads = 0;
+        const progressIncrement = 75 / activeSlots.length; // 5% start to 80%
         
-        const uploadPromises = [1, 2, 3, 4].map(async (s) => {
+        const uploadPromises = activeSlots.map(async (s) => {
           const file = slotFiles[s];
           const filename = `week-${weekVal}-photo-${s}.jpeg`;
           const path = `pictures/${filename}`;
@@ -1058,10 +1089,10 @@
           
           // Update progress dynamically
           completedUploads++;
-          updateProgressBar(5 + (completedUploads * 17)); // 22%, 39%, 56%, 73%
+          updateProgressBar(5 + (completedUploads * progressIncrement));
         });
 
-        // Wait for all 4 uploads to finish
+        // Wait for all uploads to finish
         await Promise.all(uploadPromises);
         logMsg('All photos uploaded successfully!');
 
@@ -1076,20 +1107,28 @@
         logMsg('outings-data.js fetched and decoded successfully.');
         updateProgressBar(80);
 
-        // Prepend new week data right after "const OUTINGS_DATA = ["
-        const searchStr = 'const OUTINGS_DATA = [';
-        const index = decodedContent.indexOf(searchStr);
-        if (index === -1) {
-          throw new Error('Could not parse outings-data.js (array declaration not found).');
+        // Build new images array
+        const newImagesArray = activeSlots.map(s => `"pictures/week-${weekVal}-photo-${s}.jpeg"`).join(',\n      ');
+        const newWeekObjStr = `{\n    week: ${weekVal},\n    category: "${currentCategory}",\n    images: [\n      ${newImagesArray}\n    ]\n  }`;
+
+        const weekRegex = new RegExp(`{\\s*week:\\s*${weekVal}\\s*,[\\s\\S]*?images:\\s*\\[[\\s\\S]*?\\]\\s*}`);
+        let updatedContent;
+
+        if (weekRegex.test(decodedContent)) {
+          logMsg(`Week ${weekVal} already exists. Updating its images...`);
+          updatedContent = decodedContent.replace(weekRegex, newWeekObjStr);
+        } else {
+          logMsg(`Week ${weekVal} is new. Adding it to the top...`);
+          const searchStr = 'const OUTINGS_DATA = [';
+          const index = decodedContent.indexOf(searchStr);
+          if (index === -1) {
+            throw new Error('Could not parse outings-data.js (array declaration not found).');
+          }
+          const insertIndex = index + searchStr.length;
+          const before = decodedContent.substring(0, insertIndex);
+          const after = decodedContent.substring(insertIndex);
+          updatedContent = before + '\n  ' + newWeekObjStr + ',' + after;
         }
-
-        const insertIndex = index + searchStr.length;
-        const before = decodedContent.substring(0, insertIndex);
-        const after = decodedContent.substring(insertIndex);
-
-        const newWeekEntry = `\n  {\n    week: ${weekVal},\n    category: "${currentCategory}",\n    images: [\n      "pictures/week-${weekVal}-photo-1.jpeg",\n      "pictures/week-${weekVal}-photo-2.jpeg",\n      "pictures/week-${weekVal}-photo-3.jpeg",\n      "pictures/week-${weekVal}-photo-4.jpeg"\n    ]\n  },`;
-
-        const updatedContent = before + newWeekEntry + after;
         
         // Encode updated content to base64 safely
         const encodedContent = btoa(unescape(encodeURIComponent(updatedContent)));
@@ -1113,7 +1152,7 @@
           document.getElementById('success-banner').style.display = 'block';
           document.getElementById('publish-btn').disabled = false;
           // Clear files to prevent accidental re-upload
-          for(let s=1; s<=4; s++) {
+          for(let s=1; s<=6; s++) {
             removeSlotFile(null, s);
           }
           // Increment week

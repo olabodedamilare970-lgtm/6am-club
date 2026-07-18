@@ -119,12 +119,11 @@ document.addEventListener('DOMContentLoaded', () => {
         card.className = 'recap-card reveal reveal--visible';
         card.dataset.category = item.category;
 
+        const imagesHtml = item.images.map(imgSrc => `<img src="${imgSrc}" alt="Week ${item.week} outing" loading="lazy">`).join('');
+
         card.innerHTML = `
-          <div class="recap-card__image-collage">
-            <img src="${item.images[0]}" alt="Week ${item.week} outing" class="collage-main" loading="lazy">
-            <img src="${item.images[1]}" alt="Week ${item.week} outing" loading="lazy">
-            <img src="${item.images[2]}" alt="Week ${item.week} outing" loading="lazy">
-            <img src="${item.images[3]}" alt="Week ${item.week} outing" loading="lazy">
+          <div class="recap-card__carousel">
+            ${imagesHtml}
           </div>
           <div class="recap-card__body">
             <h3 class="recap-card__title" style="margin-bottom: 0;">Week ${item.week}</h3>

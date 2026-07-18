@@ -735,24 +735,26 @@ ul, ol {
 }
 
 
-.recap-card__image-collage {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2px;
+.recap-card__carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Firefox */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   width: 100%;
 }
 
-.recap-card__image-collage img {
+.recap-card__carousel::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.recap-card__carousel img {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  flex: 0 0 85%; /* Shows 85% of image so the next one peeks in */
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  object-position: center 15%;
+  scroll-snap-align: center;
   display: block;
-  border-radius: 2px;
-  transition: transform var(--transition-slow);
-}
-
-.recap-card:hover .recap-card__image-collage img {
   transform: scale(1.03);
 }
 
