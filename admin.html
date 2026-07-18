@@ -604,9 +604,14 @@
             </div>
           </div>
           
-          <button id="publish-btn" onclick="publishOuting()" class="btn-admin" disabled>
-            🚀 Publish Outing
-          </button>
+          <div style="display: flex; gap: var(--space-sm);">
+            <button id="delete-btn" onclick="deleteOuting()" class="btn-admin" style="background: #ff4444; border-color: #cc0000; color: white; display: none;">
+              🗑️ Delete
+            </button>
+            <button id="publish-btn" onclick="publishOuting()" class="btn-admin" disabled>
+              🚀 Publish Outing
+            </button>
+          </div>
         </div>
 
         <!-- Progress Tracker Details -->
@@ -1031,6 +1036,18 @@
       }
     }
 
+    // Helper to fetch parsed outings-data.js safely
+    async function fetchOutingsData() {
+      try {
+        const file = await ghRequest('contents/outings-data.js');
+        const decodedContent = decodeURIComponent(escape(atob(file.content.replace(/\s/g, ''))));
+        return { sha: file.sha, content: decodedContent };
+      } catch (err) {
+        logMsg('Error fetching outings data', 'error');
+        throw err;
+      }
+    }
+
     // main Publish workflow
     async function publishOuting() {
       const weekVal = document.getElementById('outing-week').value;
@@ -1050,39 +1067,52 @@
       try {
         const activeSlots = [1, 2, 3, 4, 5, 6].filter(s => slotFiles[s]);
 
+        logMsg('Fetching database to check for existing week...');
+        const { sha: outingsSha, content: decodedContent } = await fetchOutingsData();
+        
+        // Use regex to find existing week and extract old image paths
+        const weekRegex = new RegExp(`{\\s*week:\\s*${weekVal}\\s*,[\\s\\S]*?category:\\s*"([^"]+)"[\\s\\S]*?images:\\s*\\[([\\s\\S]*?)\\]\\s*}`);
+        const match = decodedContent.match(weekRegex);
+        
+        if (match) {
+          logMsg(`Week ${weekVal} exists. Deleting old photos to clean storage...`);
+          const oldImagesArrayStr = match[2];
+          const oldImagePaths = oldImagesArrayStr.match(/"([^"]+)"/g)?.map(s => s.replace(/"/g, '')) || [];
+          for (const path of oldImagePaths) {
+            try {
+              const checkData = await ghRequest(`contents/${path}`);
+              await ghRequest(`contents/${path}`, {
+                method: 'DELETE',
+                body: JSON.stringify({ message: `Delete old ${path} for replacement`, sha: checkData.sha })
+              });
+              logMsg(`Deleted old photo: ${path}`);
+            } catch(e) {}
+          }
+        }
+
         // Step 1: Upload the compressed images concurrently
         logMsg(`Uploading ${activeSlots.length} photos concurrently... (this makes it much faster)`);
         
         let completedUploads = 0;
         const progressIncrement = 75 / activeSlots.length; // 5% start to 80%
+        const timestamp = Date.now();
+        const uploadedPaths = [];
         
         const uploadPromises = activeSlots.map(async (s) => {
           const file = slotFiles[s];
-          const filename = `week-${weekVal}-photo-${s}.jpeg`;
+          const filename = `week-${weekVal}-photo-${s}-${timestamp}.jpeg`;
           const path = `pictures/${filename}`;
+          uploadedPaths.push(path);
           
           logMsg(`Preparing Photo ${s} (${(file.size/1024).toFixed(0)} KB)...`);
           const base64Data = await fileToBase64(file);
           
-          // Check if photo exists first to get sha (in case they are replacing an already uploaded week)
-          let existingSha = null;
-          try {
-            const checkData = await ghRequest(`contents/${path}`);
-            existingSha = checkData.sha;
-            logMsg(`Found existing photo ${filename}, replacing it.`);
-          } catch(e) {
-            // File does not exist, safe to write new
-          }
-
-          const payload = {
-            message: `Upload ${filename} via Admin Panel`,
-            content: base64Data
-          };
-          if (existingSha) payload.sha = existingSha;
-
           await ghRequest(`contents/${path}`, {
             method: 'PUT',
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+              message: `Upload ${filename} via Admin Panel`,
+              content: base64Data
+            })
           });
 
           logMsg(`✅ Photo ${s} uploaded successfully!`);
@@ -1095,46 +1125,29 @@
         // Wait for all uploads to finish
         await Promise.all(uploadPromises);
         logMsg('All photos uploaded successfully!');
-
-        // Step 2: Fetch and update outings-data.js
-        logMsg('Fetching current outings-data.js from repository...');
-        const outingsFile = await ghRequest('contents/outings-data.js');
-        const outingsSha = outingsFile.sha;
-        
-        // Decode outings content
-        // Handle utf-8 encoding safely
-        const decodedContent = decodeURIComponent(escape(atob(outingsFile.content.replace(/\s/g, ''))));
-        logMsg('outings-data.js fetched and decoded successfully.');
         updateProgressBar(80);
 
         // Build new images array
-        const newImagesArray = activeSlots.map(s => `"pictures/week-${weekVal}-photo-${s}.jpeg"`).join(',\n      ');
+        const newImagesArray = uploadedPaths.map(p => `"${p}"`).join(',\n      ');
         const newWeekObjStr = `{\n    week: ${weekVal},\n    category: "${currentCategory}",\n    images: [\n      ${newImagesArray}\n    ]\n  }`;
 
-        const weekRegex = new RegExp(`{\\s*week:\\s*${weekVal}\\s*,[\\s\\S]*?images:\\s*\\[[\\s\\S]*?\\]\\s*}`);
         let updatedContent;
-
-        if (weekRegex.test(decodedContent)) {
-          logMsg(`Week ${weekVal} already exists. Updating its images...`);
+        if (match) {
+          logMsg(`Updating Week ${weekVal} data...`);
           updatedContent = decodedContent.replace(weekRegex, newWeekObjStr);
         } else {
           logMsg(`Week ${weekVal} is new. Adding it to the top...`);
           const searchStr = 'const OUTINGS_DATA = [';
           const index = decodedContent.indexOf(searchStr);
-          if (index === -1) {
-            throw new Error('Could not parse outings-data.js (array declaration not found).');
-          }
+          if (index === -1) throw new Error('Could not parse outings-data.js (array declaration not found).');
           const insertIndex = index + searchStr.length;
-          const before = decodedContent.substring(0, insertIndex);
-          const after = decodedContent.substring(insertIndex);
-          updatedContent = before + '\n  ' + newWeekObjStr + ',' + after;
+          updatedContent = decodedContent.substring(0, insertIndex) + '\n  ' + newWeekObjStr + ',' + decodedContent.substring(insertIndex);
         }
         
         // Encode updated content to base64 safely
         const encodedContent = btoa(unescape(encodeURIComponent(updatedContent)));
 
         logMsg(`Writing updated outings-data.js with new Week ${weekVal}...`);
-        
         await ghRequest('contents/outings-data.js', {
           method: 'PUT',
           body: JSON.stringify({
@@ -1149,6 +1162,7 @@
         
         // Hide progress details slowly and show success
         setTimeout(() => {
+          document.getElementById('success-banner').innerHTML = '<strong>Success!</strong> Outing published successfully.';
           document.getElementById('success-banner').style.display = 'block';
           document.getElementById('publish-btn').disabled = false;
           // Clear files to prevent accidental re-upload
@@ -1157,6 +1171,7 @@
           }
           // Increment week
           document.getElementById('outing-week').value = parseInt(weekVal) + 1;
+          document.getElementById('delete-btn').style.display = 'none';
         }, 1000);
 
       } catch (err) {
@@ -1165,6 +1180,101 @@
         document.getElementById('publish-btn').disabled = false;
       }
     }
+
+    // Delete Week logic
+    async function deleteOuting() {
+      const weekVal = document.getElementById('outing-week').value;
+      if (!confirm(`Are you sure you want to permanently delete Week ${weekVal}?`)) return;
+
+      document.getElementById('publish-btn').disabled = true;
+      document.getElementById('delete-btn').disabled = true;
+      const progressSection = document.getElementById('publish-progress-section');
+      progressSection.style.display = 'block';
+      const consoleDiv = document.getElementById('log-console');
+      consoleDiv.innerHTML = '';
+      
+      logMsg(`Starting deletion of Week ${weekVal}...`);
+
+      try {
+        const { sha, content } = await fetchOutingsData();
+        const weekRegex = new RegExp(`{\\s*week:\\s*${weekVal}\\s*,[\\s\\S]*?category:\\s*"([^"]+)"[\\s\\S]*?images:\\s*\\[([\\s\\S]*?)\\]\\s*},?`);
+        const match = content.match(weekRegex);
+        
+        if (!match) {
+          throw new Error(`Week ${weekVal} not found in database.`);
+        }
+
+        // Delete associated images
+        const oldImagesArrayStr = match[2];
+        const oldImagePaths = oldImagesArrayStr.match(/"([^"]+)"/g)?.map(s => s.replace(/"/g, '')) || [];
+        
+        logMsg(`Found ${oldImagePaths.length} photos to delete...`);
+        for (const path of oldImagePaths) {
+          try {
+            const checkData = await ghRequest(`contents/${path}`);
+            await ghRequest(`contents/${path}`, {
+              method: 'DELETE',
+              body: JSON.stringify({ message: `Delete ${path} via Admin Panel`, sha: checkData.sha })
+            });
+            logMsg(`Deleted ${path}`);
+          } catch(e) {
+            logMsg(`Could not delete ${path}: ${e.message}`, 'error');
+          }
+        }
+
+        // Remove from outings-data.js
+        const updatedContent = content.replace(weekRegex, '');
+        const encodedContent = btoa(unescape(encodeURIComponent(updatedContent)));
+
+        logMsg(`Updating outings-data.js to remove Week ${weekVal}...`);
+        await ghRequest('contents/outings-data.js', {
+          method: 'PUT',
+          body: JSON.stringify({ message: `Delete Week ${weekVal} via Admin Panel`, content: encodedContent, sha: sha })
+        });
+
+        logMsg('Week deleted successfully!');
+        
+        setTimeout(() => {
+          document.getElementById('delete-btn').style.display = 'none';
+          document.getElementById('publish-btn').disabled = false;
+          document.getElementById('delete-btn').disabled = false;
+          document.getElementById('outing-week').value = '';
+          document.getElementById('success-banner').innerHTML = '<strong>Success!</strong> Week deleted.';
+          document.getElementById('success-banner').style.display = 'block';
+        }, 1000);
+
+      } catch (err) {
+        logMsg(`Error: ${err.message}`, 'error');
+        document.getElementById('publish-btn').disabled = false;
+        document.getElementById('delete-btn').disabled = false;
+      }
+    }
+
+    // Auto-select category and show Delete button if week exists
+    let weekCheckTimeout;
+    document.getElementById('outing-week').addEventListener('input', (e) => {
+      validateFormState();
+      clearTimeout(weekCheckTimeout);
+      weekCheckTimeout = setTimeout(async () => {
+        const weekVal = e.target.value;
+        const deleteBtn = document.getElementById('delete-btn');
+        if (!weekVal || !isConnected) {
+          deleteBtn.style.display = 'none';
+          return;
+        }
+        try {
+          const { content } = await fetchOutingsData();
+          const weekRegex = new RegExp(`{\\s*week:\\s*${weekVal}\\s*,[\\s\\S]*?category:\\s*"([^"]+)"[\\s\\S]*?images:\\s*\\[([\\s\\S]*?)\\]\\s*}`);
+          const match = content.match(weekRegex);
+          if (match) {
+            deleteBtn.style.display = 'inline-block';
+            setCategory(match[1]); // Auto-select the category
+          } else {
+            deleteBtn.style.display = 'none';
+          }
+        } catch(err) {}
+      }, 500);
+    });
   </script>
 </body>
 </html>
