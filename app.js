@@ -147,30 +147,32 @@ document.addEventListener('DOMContentLoaded', () => {
       initCarouselAutoScroll();
     }
 
-    let carouselIntervals = [];
+    let globalCarouselInterval;
 
     function initCarouselAutoScroll() {
-      // Clear existing intervals
-      carouselIntervals.forEach(clearInterval);
-      carouselIntervals = [];
+      // Clear existing global interval to prevent duplicates
+      if (globalCarouselInterval) clearInterval(globalCarouselInterval);
 
-      const carousels = document.querySelectorAll('.recap-card__carousel');
-      carousels.forEach(carousel => {
-        const interval = setInterval(() => {
-          // Pause if user is hovering or interacting
+      // Create one synchronized interval so all carousels swipe at the exact same time
+      globalCarouselInterval = setInterval(() => {
+        const carousels = document.querySelectorAll('.recap-card__carousel');
+        carousels.forEach(carousel => {
+          // Pause if user is hovering or interacting with this specific carousel
           if (carousel.matches(':hover') || carousel.matches(':active')) return;
 
           const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-          if (carousel.scrollLeft >= maxScroll - 5) {
+          
+          // Using a slight buffer (10px) to account for fractional pixel rounding errors in scrollWidth
+          if (carousel.scrollLeft >= maxScroll - 10) {
             carousel.scrollTo({ left: 0, behavior: 'smooth' });
           } else {
-            const img = carousel.querySelector('img');
-            const scrollAmt = img ? img.clientWidth : carousel.clientWidth * 0.85;
+            // Always calculate based on 85% of the container width to guarantee consistent scrolling 
+            // even before images have fully loaded.
+            const scrollAmt = carousel.clientWidth * 0.85;
             carousel.scrollBy({ left: scrollAmt, behavior: 'smooth' });
           }
-        }, 1500);
-        carouselIntervals.push(interval);
-      });
+        });
+      }, 1500);
     }
 
     // Initial render
