@@ -734,14 +734,14 @@ ul, ol {
   opacity: 1;
 }
 
-
 .recap-card__carousel {
   display: flex;
   overflow-x: auto;
+  overflow-y: hidden; /* Prevent vertical jitter */
   scroll-snap-type: x mandatory;
   scrollbar-width: none; /* Firefox */
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  touch-action: pan-y; /* Fixes vertical page scroll getting stuck */
+  touch-action: pan-y pinch-zoom; /* Explicitly allow vertical page scroll */
   width: 100%;
 }
 
@@ -757,6 +757,8 @@ ul, ol {
   scroll-snap-align: start;
   display: block;
   transform: scale(1.03);
+  pointer-events: none; /* Prevents default image drag on mobile */
+  user-select: none;
 }
 
 .recap-card__badge {

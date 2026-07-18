@@ -148,6 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     let globalCarouselInterval;
+    let isTouchingScreen = false;
+
+    // Track if user is physically touching the screen to prevent JS scroll conflicts
+    document.addEventListener('touchstart', () => isTouchingScreen = true, { passive: true });
+    document.addEventListener('touchend', () => isTouchingScreen = false);
+    document.addEventListener('touchcancel', () => isTouchingScreen = false);
 
     function initCarouselAutoScroll() {
       // Clear existing global interval to prevent duplicates
@@ -155,6 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Create one synchronized interval so all carousels swipe at the exact same time
       globalCarouselInterval = setInterval(() => {
+        // If the user's thumb is on the screen, DO NOT run JS scroll.
+        // Firing JS scroll during native scroll causes severe stuttering/locking on iOS.
+        if (isTouchingScreen) return;
+
         const carousels = document.querySelectorAll('.recap-card__carousel');
         carousels.forEach(carousel => {
           // Pause if user is hovering or interacting with this specific carousel
