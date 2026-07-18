@@ -654,29 +654,31 @@
 
         </div>
 
-        <!-- Readiness Bar -->
-        <div class="readiness-container">
-          <div style="display: flex; align-items: center; gap: var(--space-md);">
-            <span style="font-weight: 700; font-size: 0.9rem;">Upload Readiness:</span>
-            <div class="readiness-dots">
-              <div id="dot-1" class="readiness-dot"></div>
-              <div id="dot-2" class="readiness-dot"></div>
-              <div id="dot-3" class="readiness-dot"></div>
-              <div id="dot-4" class="readiness-dot"></div>
-              <div id="dot-5" class="readiness-dot"></div>
-              <div id="dot-6" class="readiness-dot"></div>
-            </div>
-          </div>
-          
-          <div style="display: flex; gap: var(--space-sm);">
-            <button id="action-btn" onclick="executeAction()" class="btn-admin" disabled>
-              🚀 Publish New Week
-            </button>
+      </div>
+
+      <!-- Action Button (always visible, outside upload-section) -->
+      <div class="readiness-container">
+        <div id="readiness-dots-wrapper" style="display: flex; align-items: center; gap: var(--space-md);">
+          <span style="font-weight: 700; font-size: 0.9rem;">Upload Readiness:</span>
+          <div class="readiness-dots">
+            <div id="dot-1" class="readiness-dot"></div>
+            <div id="dot-2" class="readiness-dot"></div>
+            <div id="dot-3" class="readiness-dot"></div>
+            <div id="dot-4" class="readiness-dot"></div>
+            <div id="dot-5" class="readiness-dot"></div>
+            <div id="dot-6" class="readiness-dot"></div>
           </div>
         </div>
+        
+        <div style="display: flex; gap: var(--space-sm);">
+          <button id="action-btn" onclick="executeAction()" class="btn-admin" disabled>
+            🚀 Publish New Week
+          </button>
+        </div>
+      </div>
 
-        <!-- Progress Tracker Details -->
-        <div id="publish-progress-section" style="display: none; margin-top: var(--space-lg);">
+      <!-- Progress Tracker Details -->
+      <div id="publish-progress-section" style="display: none; margin-top: var(--space-lg);">
           <div style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px;">
             <span>Publishing Progress</span>
             <span id="progress-percent">0%</span>
@@ -734,7 +736,7 @@
       const categorySection = document.getElementById('category-section');
       const uploadSection = document.getElementById('upload-section');
       const actionBtn = document.getElementById('action-btn');
-      const readinessDots = document.querySelector('.readiness-container > div:first-child');
+      const readinessDots = document.getElementById('readiness-dots-wrapper');
 
       if (mode === 'add') {
         categorySection.style.display = 'block';
