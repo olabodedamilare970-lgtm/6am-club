@@ -420,6 +420,62 @@
       font-size: 3rem;
       margin-bottom: var(--space-md);
     }
+
+    /* Mode Selector */
+    .mode-selector {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      background: var(--color-bg-secondary);
+      padding: var(--space-xs);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+    }
+    
+    .mode-btn {
+      flex: 1;
+      padding: var(--space-sm) var(--space-md);
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .mode-btn.active {
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      border-color: var(--color-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mode-btn:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Info / Warning Box */
+    .status-msg-box {
+      margin-top: var(--space-sm);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+    }
+    .status-msg-box.error {
+      background: rgba(255, 68, 68, 0.1);
+      color: #ff4444;
+      border: 1px solid rgba(255, 68, 68, 0.2);
+    }
+    .status-msg-box.info {
+      background: rgba(0, 255, 136, 0.1);
+      color: var(--color-accent);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+    }
   </style>
 </head>
 <body>
@@ -449,17 +505,25 @@
     <!-- 2. DASHBOARD PANEL (HIDDEN BY DEFAULT) -->
     <div id="dashboard-panel" style="display: none;">
       
+      <!-- MODE SELECTOR -->
+      <div class="mode-selector">
+        <button id="mode-add" class="mode-btn active" onclick="setMode('add')">➕ Add New Week</button>
+        <button id="mode-overwrite" class="mode-btn" onclick="setMode('overwrite')">🔄 Overwrite Old Week</button>
+        <button id="mode-delete" class="mode-btn" onclick="setMode('delete')">🗑️ Delete a Week</button>
+      </div>
+
       <!-- Top Row Dashboard Grid -->
       <div class="dashboard-grid">
         
         <!-- Outing Week Information & Guidelines -->
         <div class="admin-card">
-          <h2 class="card-title">📅 New Outing details</h2>
+          <h2 class="card-title">📅 Outing details</h2>
           <div class="form-group">
             <label for="outing-week">Week Number</label>
             <input type="number" id="outing-week" class="form-control" min="1" placeholder="e.g. 11">
+            <div id="week-status-msg" class="status-msg-box"></div>
           </div>
-          <div class="form-group">
+          <div id="category-section" class="form-group">
             <label>Outing Category</label>
             <div class="category-selector">
               <div id="cat-run" class="category-option active" onclick="setCategory('run')">🏃‍♂️ Run</div>
@@ -518,7 +582,7 @@
 
 
       <!-- Image Upload Grid -->
-      <div class="admin-card">
+      <div id="upload-section" class="admin-card">
         <h2 class="card-title">🖼️ Upload Outing Photos (Up to 6 Photos)</h2>
         <div class="upload-grid">
           
@@ -605,11 +669,8 @@
           </div>
           
           <div style="display: flex; gap: var(--space-sm);">
-            <button id="delete-btn" onclick="deleteOuting()" class="btn-admin" style="background: #ff4444; border-color: #cc0000; color: white; display: none;">
-              🗑️ Delete
-            </button>
-            <button id="publish-btn" onclick="publishOuting()" class="btn-admin" disabled>
-              🚀 Publish Outing
+            <button id="action-btn" onclick="executeAction()" class="btn-admin" disabled>
+              🚀 Publish New Week
             </button>
           </div>
         </div>
@@ -647,12 +708,69 @@
 
   <script src="outings-data.js?v=2"></script>
   <script>
-    // State management
-    let passwordSessionKey = '6amclub_admin_logged_in';
+    const MAX_DIM = 800; // Resize large dimension to 800px max
+    let slotFiles = { 1: null, 2: null, 3: null, 4: null, 5: null, 6: null };
     let currentCategory = 'run';
-    let slotFiles = { 1: null, 2: null, 3: null, 4: null };
-    let gitConfig = { token: '', owner: 'olabodedamilare970-lgtm', repo: '6am-club' };
     let isConnected = false;
+    let currentMode = 'add'; // 'add', 'overwrite', 'delete'
+
+    let gitConfig = {
+      token: '',
+      owner: 'olabodedamilare970-lgtm', // Replace with dynamic if needed
+      repo: '6am-club'
+    };
+
+    function setMode(mode) {
+      currentMode = mode;
+      
+      // Update toggle UI
+      document.getElementById('mode-add').classList.remove('active');
+      document.getElementById('mode-overwrite').classList.remove('active');
+      document.getElementById('mode-delete').classList.remove('active');
+      document.getElementById(`mode-${mode}`).classList.add('active');
+
+      // Update Section Visibility
+      const categorySection = document.getElementById('category-section');
+      const uploadSection = document.getElementById('upload-section');
+      const actionBtn = document.getElementById('action-btn');
+      const readinessDots = document.querySelector('.readiness-container > div:first-child');
+
+      if (mode === 'add') {
+        categorySection.style.display = 'block';
+        uploadSection.style.display = 'block';
+        readinessDots.style.visibility = 'visible';
+        actionBtn.innerHTML = '🚀 Publish New Week';
+        actionBtn.style.background = 'var(--color-accent)';
+      } else if (mode === 'overwrite') {
+        categorySection.style.display = 'block';
+        uploadSection.style.display = 'block';
+        readinessDots.style.visibility = 'visible';
+        actionBtn.innerHTML = '🔄 Overwrite Week';
+        actionBtn.style.background = '#f5a623'; // warning orange
+      } else if (mode === 'delete') {
+        categorySection.style.display = 'none';
+        uploadSection.style.display = 'none';
+        readinessDots.style.visibility = 'hidden';
+        actionBtn.innerHTML = '🗑️ Permanently Delete Week';
+        actionBtn.style.background = '#ff4444'; // danger red
+      }
+
+      // Re-trigger validation
+      const weekInput = document.getElementById('outing-week');
+      if (weekInput.value) {
+        weekInput.dispatchEvent(new Event('input'));
+      } else {
+        validateFormState();
+      }
+    }
+
+    async function executeAction() {
+      if (currentMode === 'delete') {
+        await deleteOuting();
+      } else {
+        await publishOuting();
+      }
+    }
 
     // Default password check
     window.addEventListener('load', () => {
@@ -948,10 +1066,27 @@
     }
 
     function validateFormState() {
-      const publishBtn = document.getElementById('publish-btn');
+      const actionBtn = document.getElementById('action-btn');
       const weekVal = document.getElementById('outing-week').value;
+      const msgBox = document.getElementById('week-status-msg');
       
-      // At least one slot must have a file, and no slot can be "Too Large" (>1500KB)
+      // If error is showing, button stays disabled
+      if (msgBox.classList.contains('error') && msgBox.style.display === 'block') {
+        actionBtn.setAttribute('disabled', 'true');
+        return;
+      }
+
+      // In Delete mode, we just need a valid week number and connection
+      if (currentMode === 'delete') {
+        if (weekVal && isConnected && msgBox.style.display === 'block') {
+          actionBtn.removeAttribute('disabled');
+        } else {
+          actionBtn.setAttribute('disabled', 'true');
+        }
+        return;
+      }
+
+      // For Add and Overwrite modes: check photos
       let hasFile = false;
       let noLargeFiles = true;
       for (let s = 1; s <= 6; s++) {
@@ -964,9 +1099,9 @@
       }
 
       if (hasFile && noLargeFiles && weekVal && isConnected) {
-        publishBtn.removeAttribute('disabled');
+        actionBtn.removeAttribute('disabled');
       } else {
-        publishBtn.setAttribute('disabled', 'true');
+        actionBtn.setAttribute('disabled', 'true');
       }
     }
 
@@ -1051,8 +1186,9 @@
     // main Publish workflow
     async function publishOuting() {
       const weekVal = document.getElementById('outing-week').value;
+      const actionBtn = document.getElementById('action-btn');
       
-      document.getElementById('publish-btn').disabled = true;
+      actionBtn.disabled = true;
       document.getElementById('success-banner').style.display = 'none';
       
       const progressSection = document.getElementById('publish-progress-section');
@@ -1164,30 +1300,30 @@
         setTimeout(() => {
           document.getElementById('success-banner').innerHTML = '<strong>Success!</strong> Outing published successfully.';
           document.getElementById('success-banner').style.display = 'block';
-          document.getElementById('publish-btn').disabled = false;
+          actionBtn.disabled = false;
           // Clear files to prevent accidental re-upload
           for(let s=1; s<=6; s++) {
             removeSlotFile(null, s);
           }
           // Increment week
           document.getElementById('outing-week').value = parseInt(weekVal) + 1;
-          document.getElementById('delete-btn').style.display = 'none';
+          document.getElementById('outing-week').dispatchEvent(new Event('input'));
         }, 1000);
 
       } catch (err) {
         logMsg(`Error: ${err.message}`, 'error');
         console.error(err);
-        document.getElementById('publish-btn').disabled = false;
+        document.getElementById('action-btn').disabled = false;
       }
     }
 
     // Delete Week logic
     async function deleteOuting() {
       const weekVal = document.getElementById('outing-week').value;
+      const actionBtn = document.getElementById('action-btn');
       if (!confirm(`Are you sure you want to permanently delete Week ${weekVal}?`)) return;
 
-      document.getElementById('publish-btn').disabled = true;
-      document.getElementById('delete-btn').disabled = true;
+      actionBtn.disabled = true;
       const progressSection = document.getElementById('publish-progress-section');
       progressSection.style.display = 'block';
       const consoleDiv = document.getElementById('log-console');
@@ -1235,18 +1371,16 @@
         logMsg('Week deleted successfully!');
         
         setTimeout(() => {
-          document.getElementById('delete-btn').style.display = 'none';
-          document.getElementById('publish-btn').disabled = false;
-          document.getElementById('delete-btn').disabled = false;
+          actionBtn.disabled = false;
           document.getElementById('outing-week').value = '';
+          document.getElementById('outing-week').dispatchEvent(new Event('input'));
           document.getElementById('success-banner').innerHTML = '<strong>Success!</strong> Week deleted.';
           document.getElementById('success-banner').style.display = 'block';
         }, 1000);
 
       } catch (err) {
         logMsg(`Error: ${err.message}`, 'error');
-        document.getElementById('publish-btn').disabled = false;
-        document.getElementById('delete-btn').disabled = false;
+        actionBtn.disabled = false;
       }
     }
 
@@ -1257,22 +1391,60 @@
       clearTimeout(weekCheckTimeout);
       weekCheckTimeout = setTimeout(async () => {
         const weekVal = e.target.value;
-        const deleteBtn = document.getElementById('delete-btn');
+        const msgBox = document.getElementById('week-status-msg');
+        const actionBtn = document.getElementById('action-btn');
+
         if (!weekVal || !isConnected) {
-          deleteBtn.style.display = 'none';
+          msgBox.style.display = 'none';
+          validateFormState();
           return;
         }
+
+        msgBox.style.display = 'none';
+        msgBox.className = 'status-msg-box'; // reset
+
         try {
           const { content } = await fetchOutingsData();
           const weekRegex = new RegExp(`{\\s*week:\\s*${weekVal}\\s*,[\\s\\S]*?category:\\s*"([^"]+)"[\\s\\S]*?images:\\s*\\[([\\s\\S]*?)\\]\\s*}`);
           const match = content.match(weekRegex);
-          if (match) {
-            deleteBtn.style.display = 'inline-block';
-            setCategory(match[1]); // Auto-select the category
-          } else {
-            deleteBtn.style.display = 'none';
+          
+          if (currentMode === 'add') {
+            if (match) {
+              msgBox.textContent = `Error: Week ${weekVal} already exists. Switch to Overwrite Mode to edit it.`;
+              msgBox.classList.add('error');
+              msgBox.style.display = 'block';
+            } else {
+              msgBox.textContent = `Week ${weekVal} is available.`;
+              msgBox.classList.add('info');
+              msgBox.style.display = 'block';
+            }
+          } 
+          else if (currentMode === 'overwrite') {
+            if (!match) {
+              msgBox.textContent = `Error: Week ${weekVal} does not exist yet. Switch to Add Mode.`;
+              msgBox.classList.add('error');
+              msgBox.style.display = 'block';
+            } else {
+              setCategory(match[1]);
+              msgBox.textContent = `Ready to overwrite existing Week ${weekVal} (${match[1]}).`;
+              msgBox.classList.add('info');
+              msgBox.style.display = 'block';
+            }
+          }
+          else if (currentMode === 'delete') {
+            if (!match) {
+              msgBox.textContent = `Error: Week ${weekVal} does not exist.`;
+              msgBox.classList.add('error');
+              msgBox.style.display = 'block';
+            } else {
+              msgBox.textContent = `Ready to delete Week ${weekVal}. This cannot be undone.`;
+              msgBox.classList.add('error');
+              msgBox.style.display = 'block';
+            }
           }
         } catch(err) {}
+        
+        validateFormState(); // re-evaluate after showing box
       }, 500);
     });
   </script>
