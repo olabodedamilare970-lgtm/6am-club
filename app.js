@@ -162,8 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const maxScroll = carousel.scrollWidth - carousel.clientWidth;
           
-          // Using a slight buffer (10px) to account for fractional pixel rounding errors in scrollWidth
-          if (carousel.scrollLeft >= maxScroll - 10) {
+          // If we are within half a screen width of the very end, we are looking at the last image.
+          // Reset back to the first image.
+          if (carousel.scrollLeft >= maxScroll - (carousel.clientWidth * 0.5)) {
             carousel.scrollTo({ left: 0, behavior: 'smooth' });
           } else {
             // Always calculate based on 85% of the container width to guarantee consistent scrolling 
