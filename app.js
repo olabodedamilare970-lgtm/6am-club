@@ -167,9 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
           if (carousel.scrollLeft >= maxScroll - (carousel.clientWidth * 0.5)) {
             carousel.scrollTo({ left: 0, behavior: 'smooth' });
           } else {
-            // Always calculate based on 85% of the container width to guarantee consistent scrolling 
+            // Always calculate based on 100% of the container width to guarantee consistent scrolling 
             // even before images have fully loaded.
-            const scrollAmt = carousel.clientWidth * 0.85;
+            const scrollAmt = carousel.clientWidth;
             carousel.scrollBy({ left: scrollAmt, behavior: 'smooth' });
           }
         });

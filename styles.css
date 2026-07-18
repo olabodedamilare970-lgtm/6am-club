@@ -750,10 +750,10 @@ ul, ol {
 
 .recap-card__carousel img {
   width: 100%;
-  flex: 0 0 85%; /* Shows 85% of image so the next one peeks in */
+  flex: 0 0 100%; /* Show exactly one full image at a time */
   aspect-ratio: 4 / 3;
   object-fit: cover;
-  scroll-snap-align: center;
+  scroll-snap-align: start;
   display: block;
   transform: scale(1.03);
 }
