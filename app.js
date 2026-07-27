@@ -278,20 +278,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav = document.getElementById('main-nav');
 
   if (nav) {
-    let lastScrollY = 0;
-
     window.addEventListener('scroll', () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > 100) {
+      if (window.scrollY > 100) {
         nav.style.background = 'rgba(10, 10, 10, 0.9)';
         nav.style.borderBottom = '1px solid var(--color-border)';
       } else {
         nav.style.background = 'transparent';
         nav.style.borderBottom = 'none';
       }
-
-      lastScrollY = currentScrollY;
     });
   }
 
@@ -359,8 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       waText += `\n\nSee you all at 6AM this Saturday! 🌅`;
-
-      const waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
 
       // Submit animation
       submitBtn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;">Locking In Your Spot <span class="spinner"></span></span>';
@@ -509,26 +501,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-
-  const tierCTAs = {
-    'cta-community': 'community',
-    'cta-community-preview': 'community'
-  };
-
-  Object.entries(tierCTAs).forEach(([btnId, tierValue]) => {
-    const btn = document.getElementById(btnId);
-    if (btn) {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tierSelect = document.getElementById('tier-select');
-        if (tierSelect) {
-          tierSelect.value = tierValue;
-          tierSelect.dispatchEvent(new Event('change'));
-        }
-        document.getElementById('signup-form').scrollIntoView({ behavior: 'smooth' });
-      });
-    }
-  });
 
   // ─── PARALLAX EFFECT ON HERO IMAGE ────────────────────────────
   const heroImage = document.querySelector('.outings-hero__bg img');
