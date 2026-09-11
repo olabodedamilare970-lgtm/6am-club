@@ -52,6 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   revealElements.forEach(el => revealObserver.observe(el));
 
+  // ─── DYNAMIC STAT COUNTERS UPDATE ─────────────────────────────
+  if (typeof OUTINGS_DATA !== 'undefined' && Array.isArray(OUTINGS_DATA) && OUTINGS_DATA.length > 0) {
+    const totalOutings = OUTINGS_DATA.length;
+    const statOutingsEl = document.getElementById('stat-outings');
+    const statSunrisesEl = document.getElementById('stat-sunrises');
+    
+    if (statOutingsEl) statOutingsEl.textContent = totalOutings;
+    if (statSunrisesEl) statSunrisesEl.textContent = totalOutings;
+  }
+
   // ─── ANIMATED STAT COUNTERS (Outings Hero) ────────────────────
   const statElements = document.querySelectorAll('.outings-hero__stat-value');
 
@@ -119,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.className = 'recap-card reveal reveal--visible';
         card.dataset.category = item.category;
 
-        const imagesHtml = item.images.map(imgSrc => `<img src="${imgSrc}" alt="Week ${item.week} outing" loading="lazy">`).join('');
+        const imagesHtml = item.images.map((imgSrc, idx) => `<img src="${imgSrc}" alt="The 6AM Club Week ${item.week} Saturday morning run photo ${idx + 1}" loading="lazy" decoding="async">`).join('');
 
         card.innerHTML = `
           <div class="recap-card__carousel">
