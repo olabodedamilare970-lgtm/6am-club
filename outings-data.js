@@ -18,6 +18,18 @@
 
 const OUTINGS_DATA = [
   {
+    week: 18,
+    category: "run",
+    images: [
+      "pictures/week-18-photo-1-1789489216106.jpeg",
+      "pictures/week-18-photo-2-1789489216106.jpeg",
+      "pictures/week-18-photo-3-1789489216106.jpeg",
+      "pictures/week-18-photo-4-1789489216106.jpeg",
+      "pictures/week-18-photo-5-1789489216106.jpeg",
+      "pictures/week-18-photo-6-1789489216106.jpeg"
+    ]
+  },
+  {
     week: 17,
     category: "run",
     images: [
