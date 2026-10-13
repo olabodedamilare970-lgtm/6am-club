@@ -1169,7 +1169,14 @@
 
           if (!res.ok) {
             const errDetails = await res.json().catch(() => ({}));
-            throw new Error(errDetails.message || `HTTP ${res.status}`);
+            const errMsg = errDetails.message || `HTTP ${res.status}`;
+            // If GitHub hit a concurrency/lock conflict (409), allow retry
+            if (res.status === 409 && attempt < retries) {
+              logMsg(`⚠️ GitHub sync lock conflict on attempt ${attempt}. Waiting 1.5s to retry...`);
+              await new Promise(r => setTimeout(r, 1500));
+              continue;
+            }
+            throw new Error(errMsg);
           }
 
           return await res.json();
@@ -1177,7 +1184,7 @@
         } catch (err) {
           const isLastAttempt = attempt === retries;
           if (isLastAttempt) throw err;
-          logMsg(`⚠️ Network blip on attempt ${attempt}, retrying in 2s...`);
+          logMsg(`⚠️ Network/sync blip on attempt ${attempt}: ${err.message}. Retrying in 2s...`);
           await new Promise(r => setTimeout(r, 2000));
         }
       }
@@ -1238,15 +1245,16 @@
           }
         }
 
-        // Step 1: Upload the compressed images concurrently
-        logMsg(`Uploading ${activeSlots.length} photos concurrently... (this makes it much faster)`);
+        // Step 1: Upload the compressed images sequentially
+        // (Sequential upload prevents GitHub ref lock collisions: "is at X but expected Y")
+        logMsg(`Uploading ${activeSlots.length} photos sequentially...`);
         
         let completedUploads = 0;
         const progressIncrement = 75 / activeSlots.length; // 5% start to 80%
         const timestamp = Date.now();
         const uploadedPaths = [];
         
-        const uploadPromises = activeSlots.map(async (s) => {
+        for (const s of activeSlots) {
           const file = slotFiles[s];
           const filename = `week-${weekVal}-photo-${s}-${timestamp}.jpeg`;
           const path = `pictures/${filename}`;
@@ -1263,33 +1271,36 @@
             })
           });
 
-          logMsg(`✅ Photo ${s} uploaded successfully!`);
-          
-          // Update progress dynamically
           completedUploads++;
-          updateProgressBar(5 + (completedUploads * progressIncrement));
-        });
+          logMsg(`✅ Photo ${s} uploaded successfully! (${completedUploads}/${activeSlots.length})`);
+          updateProgressBar(Math.round(5 + (completedUploads * progressIncrement)));
+        }
 
-        // Wait for all uploads to finish
-        await Promise.all(uploadPromises);
         logMsg('All photos uploaded successfully!');
         updateProgressBar(80);
+
+        // Fetch fresh outings-data.js SHA to ensure optimistic lock is never stale
+        logMsg('Syncing latest outings database...');
+        const freshData = await fetchOutingsData();
+        const freshSha = freshData.sha;
+        const freshContent = freshData.content;
+        const freshMatch = freshContent.match(weekRegex);
 
         // Build new images array
         const newImagesArray = uploadedPaths.map(p => `"${p}"`).join(',\n      ');
         const newWeekObjStr = `{\n    week: ${weekVal},\n    category: "${currentCategory}",\n    images: [\n      ${newImagesArray}\n    ]\n  }`;
 
         let updatedContent;
-        if (match) {
+        if (freshMatch) {
           logMsg(`Updating Week ${weekVal} data...`);
-          updatedContent = decodedContent.replace(weekRegex, newWeekObjStr);
+          updatedContent = freshContent.replace(weekRegex, newWeekObjStr);
         } else {
           logMsg(`Week ${weekVal} is new. Adding it to the top...`);
           const searchStr = 'const OUTINGS_DATA = [';
-          const index = decodedContent.indexOf(searchStr);
+          const index = freshContent.indexOf(searchStr);
           if (index === -1) throw new Error('Could not parse outings-data.js (array declaration not found).');
           const insertIndex = index + searchStr.length;
-          updatedContent = decodedContent.substring(0, insertIndex) + '\n  ' + newWeekObjStr + ',' + decodedContent.substring(insertIndex);
+          updatedContent = freshContent.substring(0, insertIndex) + '\n  ' + newWeekObjStr + ',' + freshContent.substring(insertIndex);
         }
         
         // Encode updated content to base64 safely
@@ -1301,7 +1312,7 @@
           body: JSON.stringify({
             message: `Add Week ${weekVal} outings metadata via Admin Panel`,
             content: encodedContent,
-            sha: outingsSha
+            sha: freshSha
           })
         });
 
